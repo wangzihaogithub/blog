@@ -1,27 +1,33 @@
-title: 王小俊
+title: 王子豪
 subtitle: 个人站
 description: 欢迎来到我的个人站~
 # 头像里面的标题
-avatarTitle: Grimxiaojun
+avatarTitle: wangzihao
 # 头像里面的描述
-avatarDesc: 将成为优秀程序员的我
-url: "http://grimxiaojun.github.io"
+avatarDesc: 来自王子豪~
+url: "http://wangzihaogithub.github.io/blog"
 
 comment:
     # disqus: leopard
-    duoshuo: grimxiaojun
+    duoshuo: wangzihao
 
 # Social
 social:
     weibo: ----
-    github: grimxiaojun
+    github: github.com/wangzihaogithub
     # twitter: 
-    mail: swdwangjie@outlook.com
+    mail: 842156727@qq.com
 
 ga:
     id: UA-96239281-2
     host: auto
 
+# statistic analysis 统计代码
+# 百度统计 id，将统计代码替换为自己的百度统计id，即
+hm.src = "//hm.baidu.com/hm.js?9898c51b4ef61d18ccb3e0fc69c7729e";
+# xxxxx字符串
+baidu_tongji_id: 9898c51b4ef61d18ccb3e0fc69c7729e
+google_analytics_id: UA-72449510-4 # google 分析追踪id
 
 # 《----------------- 上面的信息修改成你自己的 ---------------------------》
 #
