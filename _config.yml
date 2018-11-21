@@ -24,7 +24,7 @@ ga:
 
 # statistic analysis 统计代码
 # 百度统计 id，将统计代码替换为自己的百度统计id，即
-hm.src = "//hm.baidu.com/hm.js?9898c51b4ef61d18ccb3e0fc69c7729e";
+#hm.src = "//hm.baidu.com/hm.js?9898c51b4ef61d18ccb3e0fc69c7729e";
 # xxxxx字符串
 baidu_tongji_id: 9898c51b4ef61d18ccb3e0fc69c7729e
 google_analytics_id: UA-72449510-4 # google 分析追踪id
