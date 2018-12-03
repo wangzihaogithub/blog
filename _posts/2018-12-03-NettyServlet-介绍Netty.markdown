@@ -55,8 +55,8 @@ Netty集成20多种丰富的协议库，如FTP，SMTP，HTTP以及各种二进�
                 }
             }
 
-        
-![](../images/postimg/nettyhallowoldsuccess.jpg)
+ ## 测试        
+![成功](../../../images/postimg/nettyhallowoldsuccess.jpg)
 
 ## 总结
 其实平时用的多的就是ChannelHandler类, 
