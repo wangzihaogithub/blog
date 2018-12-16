@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "NettyServlet-介绍Netty"
-tags: NettyServlet
+title:  "Netty-介绍Netty"
+tags: Netty
 ---
 
 ## Netty是什么？
 
 Netty是一个NIO客户端服务器框架，可以快速开发多协议服务器和客户端等网络应用程序。它简化了TCP,UDP网络编程。
 
-Netty集成20多种丰富的协议库，如FTP，SMTP，HTTP以及各种二进制和基于文本的传统协议。可供开发者有选择性的添加使用。
+Netty集成20多种丰富的协议库，如RTSP,MQTT,SMTP,HTTP以及各种二进制和基于文本的传统协议。可供开发者有选择性的添加使用。
 
 这些框架底层都用Netty [dubbo、 Hadoop、Storm、Spark、 Elasticsearch、Springboot2.0,...] 
 
