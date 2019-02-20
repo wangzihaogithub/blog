@@ -6,6 +6,7 @@ tags: Elasticsearch
 
 ## 基本增删改查的操作（可以直接拷贝到kibana的开发工具中）
 
+```
     # 保存
     PUT /wang-indexname/wang-indextype/id2
     {
@@ -86,5 +87,4 @@ tags: Elasticsearch
     
     GET _cluster/settings
     
-    
-
+```
