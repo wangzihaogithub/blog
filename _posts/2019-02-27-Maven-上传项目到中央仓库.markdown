@@ -1,0 +1,342 @@
+---
+layout: post
+title:  "Maven-上传项目到中央仓库"
+tags: Maven
+---
+
+## 第一步 设置系统变量（防止生成源码包与接口文档包乱码报错）
+
+JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
+
+
+## 第二步 将所有代码的注释规范化，只要有注释就要补全参数与返回值解释
+
+例如：
+
+错误示例
+    
+      /**
+         * servlet standard:
+         *
+         * returns the value of the specified request header
+         * as int. If the request has no title
+         * the name specified by this method returns -1. if This method does not convert headers to integers
+         * throws a NumberFormatException code. The first name is case insensitive.
+         * @param name  这里需要补全注释
+         * @exception NumberFormatException 这里需要补全注释 
+         * @return 这里需要补全注释
+         */
+        @Override
+        public int getIntHeader(String name) {
+            String headerStringValue = getHeader(name);
+            if (headerStringValue == null) {
+                return -1;
+            }
+            return Integer.parseInt(headerStringValue);
+        }
+        
+正确示例        
+        
+            /**
+             * servlet standard:
+             *
+             * returns the value of the specified request header
+             * as int. If the request has no title
+             * the name specified by this method returns -1. if This method does not convert headers to integers
+             * throws a NumberFormatException code. The first name is case insensitive.
+             * @param name  specifies the name of the request header
+             * @exception NumberFormatException If the header value cannot be converted to an int。
+             * @return An integer request header representing a value or -1 if the request does not return -1 for the header with this name
+             */
+            @Override
+            public int getIntHeader(String name) {
+                String headerStringValue = getHeader(name);
+                if (headerStringValue == null) {
+                    return -1;
+                }
+                return Integer.parseInt(headerStringValue);
+            }
+                    
+
+## 第三步 maven配置文件
+
+1.如下配置填到maven的setting.xml中
+
+      <servers>
+        <server>
+          <id>ossrh 注：这个名字与pom文件中对应</id>
+          <username>sonatype的账号</username>
+          <password>sonatype的密码</password>
+        </server>
+      </servers>
+      
+2.如下配置填到maven项目的pom.xml中
+
+        <licenses>
+           <license>
+               <name>The Apache License, Version 2.0</name>
+               <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+               <distribution>repo</distribution>
+           </license>
+        </licenses>
+       
+       <scm>
+           <connection>scm:git:https://github.com/wangzihaogithub/spring-boot-protocol.git</connection>
+           <developerConnection>scm:git:git@github.com:wangzihaogithub/spring-boot-protocol.git</developerConnection>
+           <url>git@github.com:wangzihaogithub/spring-boot-protocol.git</url>
+           <tag>spring-boot-protocol-2.0.0</tag>
+       </scm>
+       
+       <developers>
+           <developer>
+               <id>wangzihao</id>
+               <name>wangzihao</name>
+               <email>842156727@qq.com</email>
+           </developer>
+       </developers>
+       
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.5.1</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-javac</artifactId>
+                            <version>2.7</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+    
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.0.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <attach>true</attach>
+                    </configuration>
+                </plugin>
+    
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.2</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadoc</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <show>public</show>
+                        <charset>UTF-8</charset>
+                        <encoding>UTF-8</encoding>
+                        <docencoding>UTF-8</docencoding>
+                        <links>
+                            <link>http://docs.oracle.com/javase/8/docs/api</link>
+                        </links>
+                    </configuration>
+                </plugin>
+    
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    
+        <distributionManagement>
+            <snapshotRepository>
+                <id>ossrh</id>
+                <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            </snapshotRepository>
+            <repository>
+                <id>ossrh</id>
+                <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            </repository>
+        </distributionManagement>
+    
+        <profiles>
+            <profile>
+                <id>release</id>
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+    
+                            <version>3.5.1</version>
+                            <configuration>
+                                <encoding>UTF-8</encoding>
+                                <source>1.8</source>
+                                <target>1.8</target>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.codehaus.plexus</groupId>
+                                    <artifactId>plexus-compiler-javac</artifactId>
+                                    <version>2.7</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+    
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-source-plugin</artifactId>
+                            <version>3.0.1</version>
+                            <executions>
+                                <execution>
+                                    <id>attach-sources</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <attach>true</attach>
+                            </configuration>
+                        </plugin>
+    
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>2.10.2</version>
+                            <executions>
+                                <execution>
+                                    <id>attach-javadoc</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <show>public</show>
+                                <charset>UTF-8</charset>
+                                <encoding>UTF-8</encoding>
+                                <docencoding>UTF-8</docencoding>
+                                <links>
+                                    <link>http://docs.oracle.com/javase/8/docs/api</link>
+                                </links>
+                            </configuration>
+                        </plugin>
+    
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <version>1.6</version>
+                            <executions>
+                                <execution>
+                                    <id>sign-artifacts</id>
+                                    <phase>verify</phase>
+                                    <goals>
+                                        <goal>sign</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </build>
+                <distributionManagement>
+                    <snapshotRepository>
+                        <id>ossrh</id>
+                        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                    </snapshotRepository>
+                    <repository>
+                        <id>ossrh</id>
+                        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                    </repository>
+                </distributionManagement>
+            </profile>
+        </profiles>
+
+
+
+## 第四步 使用 GPG 生成密钥对，用作上传验证
+
+1.Windows 系统，可以下载 Gpg4win 软件来生成密钥对。
+
+下载地址：https://www.gpg4win.org/download.html
+
+2.查看是否安装成功
+
+gpg --version
+
+3.生成密钥对
+
+gpg --gen-key
+
+4.查看公钥
+
+gpg --list-keys
+    
+    pub   rsa2048 2017-12-16 [SC] [expires: 2019-12-16]
+    9DF36BF5DFB87B6F04DBCE3D63EC6544BEE6682D
+    uid           [ultimate] xxxxxx@qq.com
+    sub   rsa2048 2017-12-16 [E] [expires: 2019-12-16]
+
+其中 9DF36BF5DFB87B6F04DBCE3D63EC6544BEE6682D 就是公钥的指纹
+
+5.将公钥发布到 PGP 密钥服务器
+    
+    gpg --keyserver hkp://pool.sks-keyservers.net --send-keys 你的公钥指纹
+    
+6.查询公钥是否发布成功
+
+    gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 你的公钥指纹
+
+## 第五步 提交到中央仓库
+
+1.mvn clean deploy -P release verify -Dgpg.passphrase=你的密码
+
+2.登录 https://oss.sonatype.org, 在 Staging Repositories 中查看刚才已上传的构件, 点击Close稍等片刻后，再点击Release
+
+## 最后一步 注册sonatype并填写一个Issue 
+
+注册并填写一个Issue。 
+
+    地址：https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&pid=10134 
+    
+如果有人回复Issue后，则回复以下描述
+
+    The component was successfully published
+
+接下来等工作人员告诉你同步中央仓库完成的消息即可。
+
+## 关于以后的提交过程
+
+    第一次提交才这么麻烦,以后提交只用重复maven发布,OSS中Close,Release的过程就可以了,当然需要等待的时间还是10分钟和2小时.
+    如果要发布新的项目,在使用相同GroupId的情况下,与上面的过程一样.只有使用不同的GroupId的时候,才会需要再去提交Issue申请.
+    当然如果你没有换电脑的话 GPG 的过程只需要一次就行
+
+
+
+参考
+
+[将你自己的项目发布到maven中央仓库](https://www.jianshu.com/p/8c3d7fb09bce "将你自己的项目发布到maven中央仓库")
