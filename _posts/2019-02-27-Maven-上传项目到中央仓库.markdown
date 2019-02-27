@@ -282,26 +282,27 @@ JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
 
 1.Windows 系统，可以下载 Gpg4win 软件来生成密钥对。
 
-下载地址：https://www.gpg4win.org/download.html
+    下载地址：https://www.gpg4win.org/download.html
 
 2.查看是否安装成功
 
-gpg --version
+    gpg --version
 
 3.生成密钥对
 
-gpg --gen-key
+    gpg --gen-key
 
 4.查看公钥
 
-gpg --list-keys
+    gpg --list-keys
     
+显示内容如下。 其中 9DF36BF5DFB87B6F04DBCE3D63EC6544BEE6682D 就是公钥的指纹
+
     pub   rsa2048 2017-12-16 [SC] [expires: 2019-12-16]
     9DF36BF5DFB87B6F04DBCE3D63EC6544BEE6682D
     uid           [ultimate] xxxxxx@qq.com
     sub   rsa2048 2017-12-16 [E] [expires: 2019-12-16]
 
-其中 9DF36BF5DFB87B6F04DBCE3D63EC6544BEE6682D 就是公钥的指纹
 
 5.将公钥发布到 PGP 密钥服务器
     
@@ -313,9 +314,13 @@ gpg --list-keys
 
 ## 第五步 提交到中央仓库
 
-1.mvn clean deploy -P release verify -Dgpg.passphrase=你的密码
+1.cmd 进入maven项目的pom文件目录下输入以下命令
 
-2.登录 https://oss.sonatype.org, 在 Staging Repositories 中查看刚才已上传的构件, 点击Close稍等片刻后，再点击Release
+    mvn clean deploy -P release verify -Dgpg.passphrase=你的密码
+
+2.登录 https://oss.sonatype.org, 在 Staging Repositories 中找到刚才上传的构件, 
+
+    点击Close稍等片刻后，再点击Release
 
 ## 最后一步 注册sonatype并填写一个Issue 
 
@@ -337,6 +342,7 @@ gpg --list-keys
 
 
 
+
 参考
 
-[将你自己的项目发布到maven中央仓库](https://www.jianshu.com/p/8c3d7fb09bce "将你自己的项目发布到maven中央仓库")
+ - [将你自己的项目发布到maven中央仓库](https://www.jianshu.com/p/8c3d7fb09bce "将你自己的项目发布到maven中央仓库")
