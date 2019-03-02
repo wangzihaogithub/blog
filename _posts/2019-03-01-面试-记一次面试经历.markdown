@@ -47,7 +47,66 @@ tags: 面试
     关于时间复杂度 -> 简单的说. 不循环等于 o(1), 一个循环等于 o(n), 嵌套循环等于 o(n的2次方)
     
 ![松果出行的面试题1](../../../images/postimg/mianshiti1.jpg)
+
+ 松果出行的面试题-第一题答案
  
+        /**
+         * 合并从小到大的有序数组
+         * @param args args
+         */
+        public static void main(String[] args) {
+            int[] array2 = {1,2,5,9,61,80};
+            int[] array1 = {3,5,7,10,12,19,22,33};
+            int[] result = merge(array1,array2);
+            System.out.println(Arrays.toString(result));
+        }
+    
+        /**
+         * 合并从小到大的有序数组
+         * @param array1 array1
+         * @param array2 array2
+         */
+        public static int[] merge(int[] array1,int[] array2){
+            int[] result = new int[array1.length + array2.length +1 ];//留最后一位用作交换位置
+            for(int i=0; i< array1.length; i++){
+                result[i] = array1[i];
+            }
+            for(int i=0; i< array2.length; i++){
+                int array2Number = array2[i];
+                int resultCurrentIndex = array1.length + i;
+                int maxNumber = array1[array1.length -1];
+    
+                if(maxNumber <= array2Number){
+                    result[resultCurrentIndex] = array2[i];
+                }else {
+                    sort(result,resultCurrentIndex,array2Number);
+                }
+            }
+            return result;
+        }
+    
+        private static void sort(int[]result,int resultCurrentIndex,int insertData){
+            for (int j = 0; j < resultCurrentIndex; j++) {
+                int sortNumber = result[j];
+                if (sortNumber >= insertData) {
+                    insert(result, j, resultCurrentIndex, insertData);
+                    break;
+                }
+            }
+        }
+    
+        private static void insert(int[] result,int insertIndex,int endIndex,int insertData){
+            for(int i= endIndex; i> insertIndex; i--){
+                result[i] = result[i-1];
+            }
+            result[insertIndex] = insertData;
+        }
+ 
+ 松果出行的面试题-第二题答案
+  
+     grep -w '/user/list' access.log | awk '{print $1$7}'|uniq -c
+     匹配 精确等于 /user/list 从access.log文件中找 并且 将空格分割后下标为1的(ip)拼接下标为7的(api地址) 并且 去重 统计
+           
 ![松果出行的面试题2](../../../images/postimg/mianshiti2.jpg)
   
 ##### 克莱特 (回家等回复)
