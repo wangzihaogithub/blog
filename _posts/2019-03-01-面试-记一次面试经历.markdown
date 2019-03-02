@@ -90,8 +90,7 @@ tags: 面试
     
         private static void sort(int[]result,int resultCurrentIndex,int insertData){
             for (int j = 0; j < resultCurrentIndex; j++) {
-                int sortNumber = result[j];
-                if (sortNumber >= insertData) {
+                if (result[j] >= insertData) {
                     insert(result, j, resultCurrentIndex, insertData);
                     break;
                 }
