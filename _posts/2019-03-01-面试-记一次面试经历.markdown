@@ -42,7 +42,7 @@ tags: 面试
     问我最近看过哪些书, 我就记得的HTTP权威指南, 别的也忘了
     虽然平时虽然看过或用过,但是大部分都记不住或描述不出来.这些软知识要背会,不能忘记.  
     后来推荐我换供应链项目组. 技术说回家等回复
-    (下图是笔试题)
+    (下图是松果出行的面试题)
 
     关于时间复杂度 -> 简单的说. 不循环等于 o(1), 一个循环等于 o(n), 嵌套循环等于 o(n的2次方)
     
@@ -64,11 +64,6 @@ tags: 面试
             System.out.println(Arrays.toString(result)); //输出结果为[1, 2, 3, 5, 5, 7, 9, 10, 12, 19, 22, 33, 61, 80, 0]
         }
     
-        /**
-         * 合并从小到大的有序数组
-         * @param array1 array1
-         * @param array2 array2
-         */
         public static int[] merge(int[] array1,int[] array2){
             int[] result = new int[array1.length + array2.length +1 ];//留最后一位用作交换位置
             for(int i=0; i< array1.length; i++){
