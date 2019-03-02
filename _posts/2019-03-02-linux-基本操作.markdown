@@ -19,7 +19,6 @@ tags: linux
 
 ### 统计nginx日志中某url分别被不同ip的访问次数
 
-    grep -w '/user/list' access.log | awk '{print $1$7}'|uniq -c
-    
-    匹配 精确等于 /user/list 从access.log文件中找 并且 将空格分割后下标为1的(ip)拼接下标为7的(api地址) 并且 去重 统计
+      grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
+      匹配 精确等于 /user/list 从access.log文件中找 并且 将空格分割后下标为1的(ip)拼接下标为7的(api地址) 并且 排序令ip相邻 并且 去重 统计
 
