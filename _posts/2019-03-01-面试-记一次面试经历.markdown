@@ -44,6 +44,7 @@ tags: 面试
     后来推荐我换供应链项目组. 技术说回家等回复
     (下图是笔试题)
 
+    一个循环等于 o(n), 嵌套循环 等于 o(n的2次方)
 ![松果出行的面试题1](../../../images/postimg/mianshiti1.jpg)
  
 ![松果出行的面试题2](../../../images/postimg/mianshiti2.jpg)
