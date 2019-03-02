@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "pat 甲级 1126"
-
+tags: PAT-A
 ---
 # 1126. Eulerian Path (25)
 

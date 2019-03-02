@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "pat 甲级 1125"
-
+tags: PAT-A
 ---
 # 1125. Chain the Ropes (25)
 
