@@ -4,9 +4,10 @@ title:  "linux-基本操作"
 tags: linux
 ---
 
-### linux命令大全
+### linux命令大全网址
 
-http://www.runoob.com/linux/linux-command-manual.html
+ - [http://www.runoob.com/linux/linux-command-manual.html](http://www.runoob.com/linux/linux-command-manual.html "http://www.runoob.com/linux/linux-command-manual.html")
+
 
 ---
 
