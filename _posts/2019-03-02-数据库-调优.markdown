@@ -32,7 +32,7 @@ tags: 数据库
 
 ##### 1.SQL优化
 
-*  1.1 尽量不要关联大表
+*  1.1 不要关联大表
 
 *  1.2.避免在索引列上使用计算  
 
@@ -42,13 +42,22 @@ tags: 数据库
         （低效）select ... from tableName where username='张三' and age>=21
         （高效）select ... from tableName where age>=21 and username='张三'
 
-*  1.4.尽量避免使用前置百分号。
+*  1.4.避免使用前置百分号。
 
-*  1.5.尽量避免在where子句中对字段进行函数操作，否则将导致全表扫描。
+*  1.5.避免在where子句中对字段进行函数操作，否则将导致全表扫描。
 
 *  1.6.索引并不是越多越好,降低了insert和update的效率。一个表的索引数最好不要超过6个。 
 
-*  1.7.尽量避免大事务操作，提高系统并发能力。
+*  1.7.避免大事务操作，提高系统并发能力。
+
+*  1.8.主键条件进行查询；
+
+*  1.9.不要在主键上面进行更新操作，减少因为主键值的变化带来数据的移动。
+
+*  1.10.mysql innoDB的主键尽量有序
+
+*  1.10.主键占用空间越小越好
+
 
 ##### 2.SQL调用逻辑优化
 
@@ -213,55 +222,52 @@ thread_cache_size：Thread Cache 池中应该存放的连接线程数。
 
 innodb_buffer_pool_size 参数用来设置Innodb 最主要的Buffer(Innodb_Buffer_Pool)的大小，也就是缓存用户表及索引数据的最主要缓存空间，对Innodb 整体性能影响也最大。官方建议将Innodb 的Buffer Pool 设置为整个系统物理内存的50% ～ 80% 之间。
 
-mysql> show status like 'Innodb_buffer_pool_%';
+    mysql> show status like 'Innodb_buffer_pool_%';
+    
+    | Innodb_buffer_pool_pages_data | 70 |
+    
+    | Innodb_buffer_pool_pages_dirty | 0 |
+    
+    | Innodb_buffer_pool_pages_flushed | 0 |
+    
+    | Innodb_buffer_pool_pages_free | 1978|
+    
+    | Innodb_buffer_pool_pages_latched | 0 |
+    
+    | Innodb_buffer_pool_pages_misc | 0 |
+    
+    | Innodb_buffer_pool_pages_total | 2048 |
+    
+    | Innodb_buffer_pool_read_ahead_rnd | 1 |
+    
+    | Innodb_buffer_pool_read_ahead_seq | 0 |
+    
+    | Innodb_buffer_pool_read_requests | 329 |
+    
+    | Innodb_buffer_pool_reads | 19 |
+    
+    | Innodb_buffer_pool_wait_free | 0 |
+    
+    | Innodb_buffer_pool_write_requests | 0 |
 
-| Innodb_buffer_pool_pages_data | 70 |
+从上面的值我们可以看出总共2048 pages，
+还有1978 是Free 状态的仅仅只有70 个page 有数据，read 请求329 次，
+其中有19 次所请求的数据在buffer pool 中没有，
+也就是说有19 次是通过读取物理磁盘来读取数据的，
+所以很容易也就得出了Innodb Buffer Pool 的Read 命中率大概在为：(329 - 19)/ 329 * 100% = 94.22%。
 
-| Innodb_buffer_pool_pages_dirty | 0 |
-
-| Innodb_buffer_pool_pages_flushed | 0 |
-
-| Innodb_buffer_pool_pages_free | 1978|
-
-| Innodb_buffer_pool_pages_latched | 0 |
-
-| Innodb_buffer_pool_pages_misc | 0 |
-
-| Innodb_buffer_pool_pages_total | 2048 |
-
-| Innodb_buffer_pool_read_ahead_rnd | 1 |
-
-| Innodb_buffer_pool_read_ahead_seq | 0 |
-
-| Innodb_buffer_pool_read_requests | 329 |
-
-| Innodb_buffer_pool_reads | 19 |
-
-| Innodb_buffer_pool_wait_free | 0 |
-
-| Innodb_buffer_pool_write_requests | 0 |
-
-从上面的值我们可以看出总共2048 pages，还有1978 是Free 状态的仅仅只有70 个page 有数据，read 请求329 次，其中有19 次所请求的数据在buffer pool 中没有，也就是说有19 次是通过读取物理磁盘来读取数据的，所以很容易也就得出了Innodb Buffer Pool 的Read 命中率大概在为：(329 - 19)/ 329 * 100% = 94.22%。
-
-innodb_additional_mem_pool_size 所设置的是用于存放Innodb 的字典信息和其他一些内部结构所需要的内存空间。所以我们的Innodb 表越多，所需要的空间自然也就越大，系统默认值仅有1MB。当然，如果Innodb 实际运行过程中出现了实际需要的内存比设置值更大的时候，Innodb 也会继续通过OS来申请内存空间，一个常规的几百个Innodb 表的MySQL，如果不是每个表都是上百个字段的话，20MB 内存已经足够了。
+innodb_additional_mem_pool_size 所设置的是用于存放Innodb 的字典信息和其他一些内部结构所需要的内存空间。
+所以我们的Innodb 表越多，所需要的空间自然也就越大，
+系统默认值仅有1MB。当然，如果Innodb 实际运行过程中出现了实际需要的内存比设置值更大的时候，
+Innodb 也会继续通过OS来申请内存空间，
+一个常规的几百个Innodb 表的MySQL，
+如果不是每个表都是上百个字段的话，20MB 内存已经足够了。
 
 ◆ innodb_flush_log_at_trx_commit = 0，Innodb 中的Log Thread 每隔1 秒钟会将log buffer中的数据写入到文件，同时还会通知文件系统进行文件同步的flush 操作，保证数据确实已经写入到磁盘上面的物理文件。但是，每次事务的结束（commit 或者是rollback）并不会触发Log Thread 将log buffer 中的数据写入文件。所以，当设置为0 的时候，当MySQL Crash 和OS Crash 或者主机断电之后，最极端的情况是丢失1 秒时间的数据变更。(fsync)
 
 ◆ innodb_flush_log_at_trx_commit = 1，这也是Innodb 的默认设置。我们每次事务的结束都会触发Log Thread 将log buffer 中的数据写入文件并通知文件系统同步文件。这个设置是最安全的设置，能够保证不论是MySQL Crash 还是OS Crash 或者是主机断电都不会丢失任何已经提交的数据。(fsync)
 
 ◆ innodb_flush_log_at_trx_commit = 2，当我们设置为2 的时候，Log Thread 会在我们每次事务结束的时候将数据写入事务日志，但是这里的写入仅仅是调用了文件系统的文件写入操作。而我们的文件系统都是有缓存机制的，所以Log Thread 的这个写入并不能保证内容真的已经写入到物理磁盘上面完成持久化的动作。文件系统什么时候会将缓存中的这个数据同步到物理磁盘文件Log Thread 就完全不知道了。所以，当设置为2 的时候，MySQL Crash 并不会造成数据的丢失，但是OS Crash 或者是主机断电后可能丢失的数据量就完全控制在文件系统上了。(async)
-
-索引规划原则：
-
-1. 不使用唯一索引
-
-2. 为了尽量减小secondary index 的大小，提高访问效率，作为主键的字段所占用的存储空间越小越好，最好是INTEGER 类型。当然这并不是绝对的，字符串类型的数据同样也可以作为Innodb 表的主键；
-
-3. 创建表的时候尽量自己指定相应的主键，让数据按照自己预设的顺序排序存放，提高特定条件下的访问效率；
-
-4. 尽可能不要在主键上面进行更新操作，减少因为主键值的变化带来数据的移动。
-
-5. 尽可能提供主键条件进行查询；
 
 分散IO 提升磁盘响应：
 
