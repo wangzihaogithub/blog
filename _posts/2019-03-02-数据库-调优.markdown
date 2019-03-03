@@ -8,14 +8,22 @@ tags: 数据库
     
      客户端层面
      1.SQL优化 
-     2.调用逻辑优化
+     2.调用代码的逻辑优化
      3.表优化
      4.读写分离
     
      服务端层面
      1.硬件优化
      2.数据库参数优化
+        2.1 MySQL 日志设置优化
+        2.2 MySQL 查询缓存优化
+        2.3 MYSQL 网络连接优化
+        2.4 MYSQL 存储引擎优化
      3.系统参数优化
+        3.1 配置TCP/IP堆栈连接数
+        3.2 配置文件句柄数
+        3.3 配置软硬件限制
+        3.4 配置sysctl调优TCP参数
 
 下面会详细介绍各个优化点
 
@@ -103,8 +111,9 @@ tags: 数据库
 
     “query_cache_wlock_invalidate”：针对于MyISAM 存储引擎，设置当有WRITE LOCK
     
-    如果我们要了解Query Cache 的使用情况，则可以通过Query Cache 相关的状态变量来获取，如通过如下命令：
+    “sort_buffer_size“ 查询排序时缓冲区大小，只对order by和group by起作用，可增大此值为16M
     
+    如果我们要了解Query Cache 的使用情况，则可以通过Query Cache 相关的状态变量来获取，如通过如下命令：
     mysql> show status like 'Qcache%';
   
     “Qcache_free_blocks”：Query Cache 中目前还有多少剩余的blocks。如果该值显示较大，则说明Query Cache 中的内存碎片较多了，可能需要寻找合适的机会进行整理（）。
@@ -130,7 +139,7 @@ Query Cache 的限制
     3) 在Procedure，Function 以及Trigger 中的Query 不能被Cache；
     4) 包含其他很多每次执行可能得到不一样结果的函数的Query 不能被Cache。
 
-> 网络连接优化
+> MYSQL 网络连接优化
 
 mysql> show variables like 'thread%';
 mysql> show status like 'connections';
@@ -155,25 +164,134 @@ thread_cache_size：Thread Cache 池中应该存放的连接线程数。
      而是随着连接线程的创建及使用，慢慢的将用完的连接线程存入其中。
      当存放的连接线程达到thread_cache_size 值之后，MySQL 就不会再续保存用完的连接线程了。
 
+> MYSQL 存储引擎优化
+
+1、MyI SAM存储引擎优化（查询缓存＋索引缓存）
+
+2、Innodb存储引擎优化（查询缓存＋innodb_buffer_pool（索引/修改数据））
+
+物理块－－＞表－－＞索引（硬盘）－－＞索引缓存(buffer)－－＞查询缓存(cache)－－＞查询
+
+1、MyI SAM存储引擎优化（所有写操作都是直接操作物理磁盘，所以只能优化它的查询功能）
+
+1）MyISAM 索引缓存相关的几个系统参数和状态参数：
+
+◆ key_buffer_size，索引缓存大小；
+
+这个参数用来设置整个MySQL 中的常规Key Cache 大小。一般来说，如果我们的MySQL 是运行在32 位平台上，此值建议不要超过2GB 大小。如果是运行在64 位平台纸上则不用考虑此限制，但也最好不要超过4GB。
+
+◆ key_buffer_block_size，索引缓存中的Cache Block Size；
+
+在前面我们已经介绍了，在Key Cache 中的所有数据都是以Cache Block 的形式存在，而key_buffer_block_size 就是设置每个Cache Block 的大小，实际上也同时限定了我们将“.MYI”文件中的Index Block 被读入时候的File Block 的大小。
+
+2、Innodb存储引擎优化
+
+1）Innodb缓存相关优化
+
+2）事务优化
+
+3）数据存储优化
+
+innodb_buffer_pool_size 参数用来设置Innodb 最主要的Buffer(Innodb_Buffer_Pool)的大小，也就是缓存用户表及索引数据的最主要缓存空间，对Innodb 整体性能影响也最大。官方建议将Innodb 的Buffer Pool 设置为整个系统物理内存的50% ～ 80% 之间。
+
+mysql> show status like 'Innodb_buffer_pool_%';
+
+| Innodb_buffer_pool_pages_data | 70 |
+
+| Innodb_buffer_pool_pages_dirty | 0 |
+
+| Innodb_buffer_pool_pages_flushed | 0 |
+
+| Innodb_buffer_pool_pages_free | 1978|
+
+| Innodb_buffer_pool_pages_latched | 0 |
+
+| Innodb_buffer_pool_pages_misc | 0 |
+
+| Innodb_buffer_pool_pages_total | 2048 |
+
+| Innodb_buffer_pool_read_ahead_rnd | 1 |
+
+| Innodb_buffer_pool_read_ahead_seq | 0 |
+
+| Innodb_buffer_pool_read_requests | 329 |
+
+| Innodb_buffer_pool_reads | 19 |
+
+| Innodb_buffer_pool_wait_free | 0 |
+
+| Innodb_buffer_pool_write_requests | 0 |
+
+从上面的值我们可以看出总共2048 pages，还有1978 是Free 状态的仅仅只有70 个page 有数据，read 请求329 次，其中有19 次所请求的数据在buffer pool 中没有，也就是说有19 次是通过读取物理磁盘来读取数据的，所以很容易也就得出了Innodb Buffer Pool 的Read 命中率大概在为：(329 - 19)/ 329 * 100% = 94.22%。
+
+innodb_additional_mem_pool_size 所设置的是用于存放Innodb 的字典信息和其他一些内部结构所需要的内存空间。所以我们的Innodb 表越多，所需要的空间自然也就越大，系统默认值仅有1MB。当然，如果Innodb 实际运行过程中出现了实际需要的内存比设置值更大的时候，Innodb 也会继续通过OS来申请内存空间，一个常规的几百个Innodb 表的MySQL，如果不是每个表都是上百个字段的话，20MB 内存已经足够了。
+
+◆ innodb_flush_log_at_trx_commit = 0，Innodb 中的Log Thread 每隔1 秒钟会将log buffer中的数据写入到文件，同时还会通知文件系统进行文件同步的flush 操作，保证数据确实已经写入到磁盘上面的物理文件。但是，每次事务的结束（commit 或者是rollback）并不会触发Log Thread 将log buffer 中的数据写入文件。所以，当设置为0 的时候，当MySQL Crash 和OS Crash 或者主机断电之后，最极端的情况是丢失1 秒时间的数据变更。(fsync)
+
+◆ innodb_flush_log_at_trx_commit = 1，这也是Innodb 的默认设置。我们每次事务的结束都会触发Log Thread 将log buffer 中的数据写入文件并通知文件系统同步文件。这个设置是最安全的设置，能够保证不论是MySQL Crash 还是OS Crash 或者是主机断电都不会丢失任何已经提交的数据。(fsync)
+
+◆ innodb_flush_log_at_trx_commit = 2，当我们设置为2 的时候，Log Thread 会在我们每次事务结束的时候将数据写入事务日志，但是这里的写入仅仅是调用了文件系统的文件写入操作。而我们的文件系统都是有缓存机制的，所以Log Thread 的这个写入并不能保证内容真的已经写入到物理磁盘上面完成持久化的动作。文件系统什么时候会将缓存中的这个数据同步到物理磁盘文件Log Thread 就完全不知道了。所以，当设置为2 的时候，MySQL Crash 并不会造成数据的丢失，但是OS Crash 或者是主机断电后可能丢失的数据量就完全控制在文件系统上了。(async)
+
+索引规划原则：
+
+1. 不使用唯一索引
+
+2. 为了尽量减小secondary index 的大小，提高访问效率，作为主键的字段所占用的存储空间越小越好，最好是INTEGER 类型。当然这并不是绝对的，字符串类型的数据同样也可以作为Innodb 表的主键；
+
+3. 创建表的时候尽量自己指定相应的主键，让数据按照自己预设的顺序排序存放，提高特定条件下的访问效率；
+
+4. 尽可能不要在主键上面进行更新操作，减少因为主键值的变化带来数据的移动。
+
+5. 尽可能提供主键条件进行查询；
+
+分散IO 提升磁盘响应：
+
+建议将数据文件和事务日志文件分别存放于不同的物理磁盘上面以降低磁盘的相互争用，提高整体IO 性能。
+
+可以通过以下两个参数指定：
+
+innodb_log_group_home_dir 参数来指定Innodb 日志存放位置，同时再通过设置数据文件位置
+
+innodb_data_home_dir 参数来告诉Innodb 我们希望将数据文件存放在哪里。
+
+innodb_autoextend_increment 参数让我们可以自行控制表空间文件每次增加的大小。
+
+skip-locking－－忽略外部文件锁定（如VFS层的锁定）
+
+skip-networking－－启动mysql时不启动网络模块，只允许通过socket连接。
 
 ##### 3.系统参数优化
 
 * 配置TCP/IP堆栈连接数
-
-    vim /etc/sysctl.conf
-    net.ipv4.ip_local_port_range = 32768 61000 
+    
+        vim /etc/sysctl.conf
+        net.ipv4.ip_local_port_range = 32768 61000 
 
 * 配置文件句柄数,需要重启mysql
 
-    vim /etc/security/limits.conf
-    mysql soft nofile 65535
-    mysql hard nofile 65535
-    mysql soft nproc 65535
-    mysql hard nproc 65535
+        vim /etc/security/limits.conf
+        mysql soft nofile 65535
+        mysql hard nofile 65535
+        mysql soft nproc 65535
+        mysql hard nproc 65535
 
-* 配置限制大小.
--H 设置硬件资源限制.
--S 设置软件资源限制,
--n设置内核可以同时打开的文件描述符的最大值【每个进程可以打开的文件数目】【也包含打开的SOCKET数量】
+* 配置软硬件限制.
+    -H 设置硬件资源限制.
+    -S 设置软件资源限制,
+    -n设置内核可以同时打开的文件描述符的最大值【每个进程可以打开的文件数目】【也包含打开的SOCKET数量】
 
-    ulimit -HSn 65535 
+        ulimit -HSn 65535 
+  
+* 配置sysctl调优TCP参数.
+    vim /etc/sysctl.conf
+
+        net.ipv4.tcp_fin_timeout = 30 //TIME_WAIT超时时间，默认是60s
+
+        net.ipv4.tcp_tw_reuse = 1 //1表示开启复用，允许TIME_WAIT socket重新用于新的TCP连接，0表示关闭
+    
+        net.ipv4.tcp_tw_recycle = 1  //1表示开启TIME_WAIT socket快速回收，0表示关闭
+        
+        net.ipv4.tcp_max_tw_buckets = 4096  //系统保持TIME_WAIT socket最大数量，如果超出这个数，系统将随机清除一些TIME_WAIT并打印警告信息
+    
+        net.ipv4.tcp_max_syn_backlog = 4096 //进入SYN队列最大长度，加大队列长度可容纳更多的等待连接
+
