@@ -1,0 +1,179 @@
+---
+layout: post
+title:  "数据库-调优"
+tags: 数据库
+---
+
+数据库调优分为[客户端层面,服务端层面]
+    
+     客户端层面
+     1.SQL优化 
+     2.调用逻辑优化
+     3.表优化
+     4.读写分离
+    
+     服务端层面
+     1.硬件优化
+     2.数据库参数优化
+     3.系统参数优化
+
+下面会详细介绍各个优化点
+
+### 客户端层面
+
+##### 1.SQL优化
+
+##### 2.调用逻辑优化
+
+##### 3.表优化
+
+##### 4.读写分离
+
+---
+
+### 服务端层面
+
+##### 1.硬件优化
+
+    1.固态硬盘
+    2.磁盘阵列(RAID)
+    3.内存 注:同时要将数据库参数的缓存池大小调大
+    4.CPU 
+    5.网络
+
+##### 2.数据库参数优化
+
+> MySQL 日志设置优化
+
+    1.分离日志文件和数据文件,把它们放不同存储.尽量日志数据放在单独的存储上(通过API放在其他电脑), 提升磁盘IO的性能
+    2.数据库服务器只打开系统错误日志,别的都关掉,尽可能减少IO损耗,
+
+*  1、错误日志（ErrorLog）
+
+*  2、二进制日志（Binlog）
+        所有环境需打开,MYSQL实现复制的基本条件
+        
+        mysql> show variables like '%binlog%';
+        
+        “binlog_cache_size"：在对数据增删改的过程中容纳二进制日志SQL 语句的缓存大小。
+        
+        “max_binlog_cache_size”：和"binlog_cache_size"相对应，但是所代表的是binlog 能够使用的最大cache 内存大小
+        
+        “max_binlog_size”：Binlog 日志最大值，一般来说设置为512M 或者1G，但不能超过1G。
+        
+        “sync_binlog”：这个参数是对于MySQL 系统来说是至关重要的，他不仅影响到Binlog 对MySQL 所带来的性能损耗，而且还影响到MySQL 中数据的完整性。
+            a）sync_binlog=0，当事务提交之后，MySQL 不做fsync 之类的磁盘同步指令刷新binlog_cache 中的信息到磁盘，而让Filesystem 自行决定什么时候来做同步，或者cache 满了之后才同步到磁盘。
+            b）sync_binlog=n，当每进行n 次事务提交之后，MySQL 将进行一次fsync 之类的磁盘同步指令来将binlog_cache 中的数据强制写入磁盘。
+            c），“sync_binlog”设置为0 和设置为1 的系统写入性能差距可能高达5 倍甚至更多。
+    
+*  3、查询日志（Query Log）
+    生产系统中需关闭,查询日志会对IO带来较大负担
+    
+*  4、慢查询日志（Slow Query Log）
+    所有环境需打开,超过特定数值（由我们自行设置）的SQL 语句。
+    
+        mysql> show variables like 'log_slow%';
+        | log_slow_queries | ON |
+        mysql> show variables like 'long_query%'
+        | long_query_time | 1 |
+        
+        下面参数可以直接写到my.cnf配置文件中
+        log-slow-query=on
+        slow_query_log_file=/data/mysqld-slow.log
+        log-slow-admin-statements
+        log-queries-not-using-indexes
+        long_query_time=1 －－超过1秒的查询都会被记录下来
+        log-short-format －－短格式记录慢日志
+
+*  5、事务日志 tr_logs(3group)-->innodb
+
+> MySQL 查询缓存优化
+
+    mysql> show variables like '%query_cache%';
+    
+    “have_query_cache”：该MySQL 是否支持Query Cache；
+    
+    “query_cache_limit”：Query Cache 存放的单条Query 最大Result Set ，默认1M；
+    
+    “query_cache_min_res_unit”：Query Cache 每个Result Set 存放的最小内存大小，默认4k；
+    
+    “query_cache_size”：系统中用于Query Cache 内存的大小；
+    
+    “query_cache_type”：系统是否打开了Query Cache 功能；
+
+    “query_cache_wlock_invalidate”：针对于MyISAM 存储引擎，设置当有WRITE LOCK
+    
+    如果我们要了解Query Cache 的使用情况，则可以通过Query Cache 相关的状态变量来获取，如通过如下命令：
+    
+    mysql> show status like 'Qcache%';
+  
+    “Qcache_free_blocks”：Query Cache 中目前还有多少剩余的blocks。如果该值显示较大，则说明Query Cache 中的内存碎片较多了，可能需要寻找合适的机会进行整理（）。
+    
+    “Qcache_free_memory”：Query Cache 中目前剩余的内存大小。通过这个参数我们可以较为准确的观察出当前系统中的Query Cache 内存大小是否足够，是需要增加还是过多了；
+    
+    “Qcache_hits”：多少次命中。通过这个参数我们可以查看到Query Cache 的基本效果；
+    
+    “Qcache_inserts”：多少次未命中然后插入。通过“Qcache_hits”和“Qcache_inserts”两个参数我们就可以算出Query Cache 的命中率了：Query Cache 命中率= Qcache_hits / ( Qcache_hits + Qcache_inserts )；
+    
+    “Qcache_lowmem_prunes”：多少条Query 因为内存不足而被清除出Query Cache。通过“Qcache_lowmem_prunes”和“Qcache_free_memory”相互结合，能够更清楚的了解到我们系统中Query Cache 的内存大小是否真的足够，是否非常频繁的出现因为内存不足而有Query 被换出
+    
+    “Qcache_not_cached”：因为query_cache_type 的设置或者不能被cache 的Query 的数量；
+    
+    “Qcache_queries_in_cache”：当前Query Cache 中cache 的Query 数量；
+    
+    “Qcache_total_blocks”：当前Query Cache 中的block 数量；
+    
+Query Cache 的限制
+    
+    1) 5.1.17 之前的版本不能Cache 绑定变量的Query，但是从5.1.17 版本开始，Query Cache 已经开始支持帮定变量的Query 了；
+    2) 所有子查询中的外部查询SQL 不能被Cache；
+    3) 在Procedure，Function 以及Trigger 中的Query 不能被Cache；
+    4) 包含其他很多每次执行可能得到不一样结果的函数的Query 不能被Cache。
+
+> 网络连接优化
+
+mysql> show variables like 'thread%';
+mysql> show status like 'connections';
+mysql> show status like '%thread%';
+
+max_conecctions：整个MySQL 允许的最大连接数；
+     
+max_user_connections：每个用户允许的最大连接数；
+
+thread_stack：每个连接线程被创建的时候，MySQL 给他分配的内存大小。系统的默认值（192KB）
+
+back_log：在MySQL 的连接请求等待队列中允许存放的最大连接请求数. 
+
+    系统默认值为50，最大可以设置为65535。
+    当我们增大back_log 的设置的时候，同时还需要注意OS 级别对网络监听队列的限制，
+    因为如果OS 的网络监听设置小于MySQL 的back_log 设置的时候，
+    我们加大“back_log”设置是没有意义的。
+     
+thread_cache_size：Thread Cache 池中应该存放的连接线程数。
+     
+     当系统最初启动的时候，并不会马上就创建thread_cache_size 所设置数目的连接线程存放在Thread Cache 池中，
+     而是随着连接线程的创建及使用，慢慢的将用完的连接线程存入其中。
+     当存放的连接线程达到thread_cache_size 值之后，MySQL 就不会再续保存用完的连接线程了。
+
+
+##### 3.系统参数优化
+
+* 配置TCP/IP堆栈连接数
+
+    vim /etc/sysctl.conf
+    net.ipv4.ip_local_port_range = 32768 61000 
+
+* 配置文件句柄数,需要重启mysql
+
+    vim /etc/security/limits.conf
+    mysql soft nofile 65535
+    mysql hard nofile 65535
+    mysql soft nproc 65535
+    mysql hard nproc 65535
+
+* 配置限制大小.
+-H 设置硬件资源限制.
+-S 设置软件资源限制,
+-n设置内核可以同时打开的文件描述符的最大值【每个进程可以打开的文件数目】【也包含打开的SOCKET数量】
+
+    ulimit -HSn 65535 
