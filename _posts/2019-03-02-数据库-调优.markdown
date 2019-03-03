@@ -7,23 +7,23 @@ tags: 数据库
 数据库调优分为[客户端层面,服务端层面]
     
      客户端层面
-     1.SQL优化 
-     2.调用代码的逻辑优化
-     3.表优化
-     4.读写分离
+         1.SQL优化 
+         2.调用代码的逻辑优化
+         3.表优化
+         4.读写分离
     
      服务端层面
-     1.硬件优化
-     2.数据库参数优化
-        2.1 MySQL 日志设置优化
-        2.2 MySQL 查询缓存优化
-        2.3 MYSQL 网络连接优化
-        2.4 MYSQL 存储引擎优化
-     3.系统参数优化
-        3.1 配置TCP/IP堆栈连接数
-        3.2 配置文件句柄数
-        3.3 配置软硬件限制
-        3.4 配置sysctl调优TCP参数
+         1.硬件优化
+         2.数据库参数优化
+            2.1 MySQL 日志设置优化
+            2.2 MySQL 查询缓存优化
+            2.3 MYSQL 网络连接优化
+            2.4 MYSQL 存储引擎优化
+         3.系统参数优化
+            3.1 配置TCP/IP堆栈连接数
+            3.2 配置文件句柄数
+            3.3 配置软硬件限制
+            3.4 配置sysctl调优TCP参数
 
 下面会详细介绍各个优化点
 
@@ -32,23 +32,23 @@ tags: 数据库
 
 ##### 1.SQL优化
 
-> 尽量不要关联大表
+*  1.1 尽量不要关联大表
 
-> 避免在索引列上使用计算  
+*  1.2.避免在索引列上使用计算  
 
-> 不同类型的索引效能是不一样的，应尽可能先使用效能高的
+*  1.3.不同类型的索引效能是不一样的，应尽可能先使用效能高的
 
-    数字类型的索引查找效率高于字符串类型，定长字符串char、nchar的索引效率高于变长字符串varchar、nvarchar的索引。
-    （低效）select ... from tableName where username='张三' and age>=21
-    （高效）select ... from tableName where age>=21 and username='张三'
+        数字类型的索引查找效率高于字符串类型，定长字符串char、nchar的索引效率高于变长字符串varchar、nvarchar的索引。
+        （低效）select ... from tableName where username='张三' and age>=21
+        （高效）select ... from tableName where age>=21 and username='张三'
 
-> 尽量避免使用前置百分号。
+*  1.4.尽量避免使用前置百分号。
 
-> 尽量避免在where子句中对字段进行函数操作，否则将导致全表扫描。
+*  1.5.尽量避免在where子句中对字段进行函数操作，否则将导致全表扫描。
 
-> 索引并不是越多越好,降低了insert和update的效率。一个表的索引数最好不要超过6个。 
+*  1.6.索引并不是越多越好,降低了insert和update的效率。一个表的索引数最好不要超过6个。 
 
-> 尽量避免大事务操作，提高系统并发能力。
+*  1.7.尽量避免大事务操作，提高系统并发能力。
 
 ##### 2.SQL调用逻辑优化
 
@@ -70,14 +70,14 @@ tags: 数据库
 
 ##### 2.数据库参数优化
 
-> MySQL 日志设置优化
+###### 2.1 MySQL 日志设置优化
 
     1.分离日志文件和数据文件,把它们放不同存储.尽量日志数据放在单独的存储上(通过API放在其他电脑), 提升磁盘IO的性能
     2.数据库服务器只打开系统错误日志,别的都关掉,尽可能减少IO损耗,
 
-*  1、错误日志（ErrorLog）
+*  2.1.1、错误日志（ErrorLog）
 
-*  2、二进制日志（Binlog）
+*  2.1.2、二进制日志（Binlog）
         所有环境需打开,MYSQL实现复制的基本条件
         
         mysql> show variables like '%binlog%';
@@ -93,10 +93,10 @@ tags: 数据库
             b）sync_binlog=n，当每进行n 次事务提交之后，MySQL 将进行一次fsync 之类的磁盘同步指令来将binlog_cache 中的数据强制写入磁盘。
             c），“sync_binlog”设置为0 和设置为1 的系统写入性能差距可能高达5 倍甚至更多。
     
-*  3、查询日志（Query Log）
+*  2.1.3、查询日志（Query Log）
     生产系统中需关闭,查询日志会对IO带来较大负担
     
-*  4、慢查询日志（Slow Query Log）
+*  2.1.4、慢查询日志（Slow Query Log）
     所有环境需打开,超过特定数值（由我们自行设置）的SQL 语句。
     
         mysql> show variables like 'log_slow%';
@@ -112,9 +112,9 @@ tags: 数据库
         long_query_time=1 －－超过1秒的查询都会被记录下来
         log-short-format －－短格式记录慢日志
 
-*  5、事务日志 tr_logs(3group)-->innodb
+*  2.1.5、事务日志 tr_logs(3group)-->innodb
 
-> MySQL 查询缓存优化
+###### 2.2 MySQL 查询缓存优化
 
     mysql> show variables like '%query_cache%';
     
@@ -158,7 +158,7 @@ Query Cache 的限制
     3) 在Procedure，Function 以及Trigger 中的Query 不能被Cache；
     4) 包含其他很多每次执行可能得到不一样结果的函数的Query 不能被Cache。
 
-> MYSQL 网络连接优化
+###### 2.3 MYSQL 网络连接优化
 
 mysql> show variables like 'thread%';
 mysql> show status like 'connections';
@@ -183,7 +183,7 @@ thread_cache_size：Thread Cache 池中应该存放的连接线程数。
      而是随着连接线程的创建及使用，慢慢的将用完的连接线程存入其中。
      当存放的连接线程达到thread_cache_size 值之后，MySQL 就不会再续保存用完的连接线程了。
 
-> MYSQL 存储引擎优化
+###### 2.4 MYSQL 存储引擎优化
 
 1、MyI SAM存储引擎优化（查询缓存＋索引缓存）
 
@@ -281,37 +281,37 @@ skip-networking－－启动mysql时不启动网络模块，只允许通过socket
 
 ##### 3.系统参数优化
 
-* 配置TCP/IP堆栈连接数
+###### 3.1 配置TCP/IP堆栈连接数
     
         vim /etc/sysctl.conf
+        
         net.ipv4.ip_local_port_range = 32768 61000 
 
-* 配置文件句柄数,需要重启mysql
+###### 3.2 配置文件句柄数,需要重启mysql
 
         vim /etc/security/limits.conf
+        
         mysql soft nofile 65535
         mysql hard nofile 65535
         mysql soft nproc 65535
         mysql hard nproc 65535
 
-* 配置软硬件限制.
-    -H 设置硬件资源限制.
-    -S 设置软件资源限制,
-    -n设置内核可以同时打开的文件描述符的最大值【每个进程可以打开的文件数目】【也包含打开的SOCKET数量】
+###### 3.3 配置软硬件限制.
+
+-H 设置硬件资源限制.
+-S 设置软件资源限制,
+-n设置内核可以同时打开的文件描述符的最大值【每个进程可以打开的文件数目】【也包含打开的SOCKET数量】
 
         ulimit -HSn 65535 
   
-* 配置sysctl调优TCP参数.
-    vim /etc/sysctl.conf
+###### 3.4 配置sysctl调优TCP参数.
+
+        vim /etc/sysctl.conf
 
         net.ipv4.tcp_fin_timeout = 30 //TIME_WAIT超时时间，默认是60s
-
         net.ipv4.tcp_tw_reuse = 1 //1表示开启复用，允许TIME_WAIT socket重新用于新的TCP连接，0表示关闭
-    
         net.ipv4.tcp_tw_recycle = 1  //1表示开启TIME_WAIT socket快速回收，0表示关闭
-        
         net.ipv4.tcp_max_tw_buckets = 4096  //系统保持TIME_WAIT socket最大数量，如果超出这个数，系统将随机清除一些TIME_WAIT并打印警告信息
-    
         net.ipv4.tcp_max_syn_backlog = 4096 //进入SYN队列最大长度，加大队列长度可容纳更多的等待连接
 
 
