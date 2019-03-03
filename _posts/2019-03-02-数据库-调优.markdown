@@ -30,7 +30,7 @@ tags: 数据库
 
 ### 客户端层面
 
-##### 1.SQL优化
+#### 1.SQL优化
 
 *  1.1 不要关联大表
 
@@ -59,17 +59,17 @@ tags: 数据库
 *  1.10.主键占用空间越小越好
 
 
-##### 2.SQL调用逻辑优化
+#### 2.SQL调用逻辑优化
 
-##### 3.表优化
+#### 3.表优化
 
-##### 4.读写分离
+#### 4.读写分离
 
 ---
 
 ### 服务端层面
 
-##### 1.硬件优化
+#### 1.硬件优化
 
     1.固态硬盘
     2.磁盘阵列(RAID)
@@ -77,12 +77,13 @@ tags: 数据库
     4.CPU 
     5.网络
 
-##### 2.数据库参数优化
+#### 2.数据库参数优化
 
-###### 2.1 MySQL 日志设置优化
+##### 2.1 MySQL 日志设置优化
 
-    1.分离日志文件和数据文件,把它们放不同存储.尽量日志数据放在单独的存储上(通过API放在其他电脑), 提升磁盘IO的性能
-    2.数据库服务器只打开系统错误日志,别的都关掉,尽可能减少IO损耗,
+一. 分离日志文件和数据文件,把它们放不同存储.尽量日志数据放在单独的存储上(通过API放在其他电脑), 提升磁盘IO的性能
+
+二. 数据库服务器只打开系统错误日志,别的都关掉,尽可能减少IO损耗,
 
 *  2.1.1、错误日志（ErrorLog）
 
@@ -123,7 +124,7 @@ tags: 数据库
 
 *  2.1.5、事务日志 tr_logs(3group)-->innodb
 
-###### 2.2 MySQL 查询缓存优化
+##### 2.2 MySQL 查询缓存优化
 
     mysql> show variables like '%query_cache%';
     
@@ -167,7 +168,7 @@ Query Cache 的限制
     3) 在Procedure，Function 以及Trigger 中的Query 不能被Cache；
     4) 包含其他很多每次执行可能得到不一样结果的函数的Query 不能被Cache。
 
-###### 2.3 MYSQL 网络连接优化
+##### 2.3 MYSQL 网络连接优化
 
 mysql> show variables like 'thread%';
 mysql> show status like 'connections';
@@ -192,7 +193,7 @@ thread_cache_size：Thread Cache 池中应该存放的连接线程数。
      而是随着连接线程的创建及使用，慢慢的将用完的连接线程存入其中。
      当存放的连接线程达到thread_cache_size 值之后，MySQL 就不会再续保存用完的连接线程了。
 
-###### 2.4 MYSQL 存储引擎优化
+##### 2.4 MYSQL 存储引擎优化
 
 1、MyI SAM存储引擎优化（查询缓存＋索引缓存）
 
@@ -285,15 +286,15 @@ skip-locking－－忽略外部文件锁定（如VFS层的锁定）
 
 skip-networking－－启动mysql时不启动网络模块，只允许通过socket连接。
 
-##### 3.系统参数优化
+#### 3.系统参数优化
 
-###### 3.1 配置TCP/IP堆栈连接数
+##### 3.1 配置TCP/IP堆栈连接数
     
         vim /etc/sysctl.conf
         
         net.ipv4.ip_local_port_range = 32768 61000 
 
-###### 3.2 配置文件句柄数,需要重启mysql
+##### 3.2 配置文件句柄数,需要重启mysql
 
         vim /etc/security/limits.conf
         
@@ -302,7 +303,7 @@ skip-networking－－启动mysql时不启动网络模块，只允许通过socket
         mysql soft nproc 65535
         mysql hard nproc 65535
 
-###### 3.3 配置软硬件限制.
+##### 3.3 配置软硬件限制.
 
 -H 设置硬件资源限制.
 -S 设置软件资源限制,
@@ -310,7 +311,7 @@ skip-networking－－启动mysql时不启动网络模块，只允许通过socket
 
         ulimit -HSn 65535 
   
-###### 3.4 配置sysctl调优TCP参数.
+##### 3.4 配置sysctl调优TCP参数.
 
         vim /etc/sysctl.conf
 
