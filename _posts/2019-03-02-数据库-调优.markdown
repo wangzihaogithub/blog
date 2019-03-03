@@ -27,11 +27,30 @@ tags: 数据库
 
 下面会详细介绍各个优化点
 
+
 ### 客户端层面
 
 ##### 1.SQL优化
 
-##### 2.调用逻辑优化
+> 尽量不要关联大表
+
+> 避免在索引列上使用计算  
+
+> 不同类型的索引效能是不一样的，应尽可能先使用效能高的
+
+    数字类型的索引查找效率高于字符串类型，定长字符串char、nchar的索引效率高于变长字符串varchar、nvarchar的索引。
+    （低效）select ... from tableName where username='张三' and age>=21
+    （高效）select ... from tableName where age>=21 and username='张三'
+
+> 尽量避免使用前置百分号。
+
+> 尽量避免在where子句中对字段进行函数操作，否则将导致全表扫描。
+
+> 索引并不是越多越好,降低了insert和update的效率。一个表的索引数最好不要超过6个。 
+
+> 尽量避免大事务操作，提高系统并发能力。
+
+##### 2.SQL调用逻辑优化
 
 ##### 3.表优化
 
@@ -295,3 +314,9 @@ skip-networking－－启动mysql时不启动网络模块，只允许通过socket
     
         net.ipv4.tcp_max_syn_backlog = 4096 //进入SYN队列最大长度，加大队列长度可容纳更多的等待连接
 
+
+参考
+
+ - [MYSQL数据库调优就是这么简单](https://baijiahao.baidu.com/s?id=1577967938491706816&wfr=spider&for=pc "MYSQL数据库调优就是这么简单")
+
+ - [MySQL/Oracle数据库优化总结（非常全面）](https://blog.csdn.net/baidu_37107022/article/details/77460464 "MySQL/Oracle数据库优化总结（非常全面）")
