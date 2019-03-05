@@ -150,6 +150,10 @@ tags: 面试
         private static ThreadLocal<Map> mapThreadLocal2 = ThreadLocal.withInitial(HashMap::new);
                 
         public static boolean wordPattern(String pattern, String str) {
+            if(pattern==null || str == null || str.isEmpty()){
+                return false;
+            }
+            
             String[] array = str.split(" ");
             if(pattern.length() != array.length){
                 return false;
