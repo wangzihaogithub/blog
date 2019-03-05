@@ -1,0 +1,24 @@
+---
+layout: post
+title:  "网络协议-MQTT"
+tags: 网络协议
+---
+
+### MQTT是什么?
+
+MQTT是基于发布订阅模式的轻量级通讯协议
+
+点击下面链接查看协议规范
+
+https://mcxiaoke.gitbooks.io/mqtt-cn/content/mqtt/01-Introduction.html
+
+### MQTT的代码实现
+
+1.连接 -> 登录
+
+2.订阅(质量,主题)
+
+3.
+
+
+
