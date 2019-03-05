@@ -135,8 +135,40 @@ tags: 面试
 
 ##### 天猫事业部二面 (推迟至周一)
 
-    我打电话给客服说推迟到下周一19.30,白天太累了, 下午就不在状态了, 周末要好好准备下
+我打电话给客服说推迟到下周一19.30,白天太累了, 下午就不在状态了, 周末要好好准备下
     
+笔试题如下
+   
+        //评测题目: 有一个字符串它的构成是词+空格的组合，如“北京 杭州 杭州 北京”，
+        //要求输入一个匹配模式（简单的以字符来写）， 比如 aabb, 来判断该字符串是否符合该模式，
+        //举个例子：
+        //1. pattern = "abba", str="北京 杭州 杭州 北京" 返回 ture
+        //2. pattern = "aabb", str="北京 杭州 杭州 北京" 返回 false
+        //3. pattern = "baab", str="北京 杭州 杭州 北京" 返回 ture
+        
+        private static ThreadLocal<Map> mapThreadLocal1 = ThreadLocal.withInitial(HashMap::new);
+        private static ThreadLocal<Map> mapThreadLocal2 = ThreadLocal.withInitial(HashMap::new);
+                
+        public static boolean wordPattern(String pattern, String str) {
+            String[] array = str.split(" ");
+            if(pattern.length() != array.length){
+                return false;
+            }
+    
+            Map map1 = mapThreadLocal1.get();
+            Map map2 = mapThreadLocal2.get();
+            boolean result = true;
+            for(int i=0; i<array.length; i++){
+                if(map1.put(pattern.charAt(i),i) != map2.put(array[i],i)){
+                    result = false;
+                    break;
+                }
+            }
+            map1.clear();
+            map2.clear();
+            return result;
+        }
+
     
 ---
  
