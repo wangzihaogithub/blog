@@ -12,7 +12,7 @@ Canal是阿里巴巴的基于mysql数据库binlog的增量订阅&消费组件
 
 https://github.com/alibaba/canal
 
-### 用服务端视角去看canal都做了什么事情 (by canal-1.1.3版本)
+### 以服务端视角去看canal都做了什么事情 (by canal-1.1.3版本)
 
 canal主要有三个应用角色 [mysql, canal-server, canal-client]
 
