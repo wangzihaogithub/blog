@@ -65,9 +65,9 @@ canal主要有三个应用角色 [mysql, canal-server, canal-client]
          *         4.1.CanalEventSink
          *              1. EntryEventSink.doSink() ->
          *              2. 拦截器CanalEventDownStreamHandler
-         *                      多库归并排序Event对象(HA 多group的实现, 需要使用group-instance.xml),
-         *                      3.普罗米修斯监控,
-         *                      4.过滤mysql心跳sql事件(会有定时任务执行sql语句保持心跳MysqlEventParser.buildHeartBeatTimeTask)
+         *                      -多库归并排序Event对象(HA 多group的实现, 需要使用group-instance.xml),
+         *                      -普罗米修斯监控,
+         *                      -过滤mysql心跳sql事件(会有定时任务执行sql语句保持心跳MysqlEventParser.buildHeartBeatTimeTask)
          *                              ->  EntryEventSink.tryPut()提交到内存里 )
          *
          *       五.事件存储(目前canal-1.1.3版本只有内存存储)
