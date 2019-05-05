@@ -99,6 +99,16 @@ canal主要有三个应用角色 [mysql, canal-server, canal-client]
          *              注: CanalServerWithEmbedded中有一个CanalMetaManager实现了以下操作与存储(记录点pos,订阅信息,客户端信息clientId)
          *                       CanalMetaManager的实现有 [1.内存+zookeeper  2.内存+本地文件]
          *
-        
+         *
+         *
+         *
+         *
+         * 以客户端视角去看canal都做了什么事情?
+         *          1. while(true) getWithoutAck(1000条) -> process(Dml)
+         *
+         *      客户端实现了什么?
+         *          1. 实现了3种断线重连(单点 , HA-zookeeper, HA-配置文件)
+         *          2. 实现了热修改配置文件 (本地文件扫描-定时任务, 远程DB-定时任务)
+         *
         
         
