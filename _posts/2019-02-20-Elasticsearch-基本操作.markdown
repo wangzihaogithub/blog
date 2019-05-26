@@ -87,4 +87,6 @@ tags: Elasticsearch
     
     GET _cluster/settings
     
+    #查询各个节点安装的插件
+    GET /_cat/plugins?v&s=component&h=name,component,version,description
 ```
