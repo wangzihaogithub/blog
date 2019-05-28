@@ -89,4 +89,12 @@ tags: Elasticsearch
     
     #查询各个节点安装的插件
     GET /_cat/plugins?v&s=component&h=name,component,version,description
+
+    #查询分词结果
+    POST test-ig_zues_db_ig_zues-biz_corp/_analyze
+    {
+      "field": "name",
+      "text": "豪-大数据工程师"
+    }
+    
 ```
