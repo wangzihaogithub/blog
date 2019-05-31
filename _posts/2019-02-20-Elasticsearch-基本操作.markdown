@@ -98,3 +98,58 @@ tags: Elasticsearch
     }
     
 ```
+
+## 安装过程
+
+```
+
+    7  groupadd elasticsearch
+    8  useradd elasticsearch -g elasticsearch -p elasticsearch
+
+   12  yum install lrzsz
+   13  yum -y install java-1.8.0-openjdk*
+   29  yum install zip unzip
+   10  cd /home/elasticsearch/
+   16  rz
+   17  tar -zxvf elasticsearch-6.7.0.tar.gz 
+   19  chown -R elasticsearch:elasticsearch /home/elasticsearch/elasticsearch-6.7.0
+   23  cd elasticsearch/elasticsearch-6.7.0
+   25  ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.7.0/elasticsearch-analysis-ik-6.7.0.zip
+   26  cd plugins/
+   27  rz
+   28  unzip dynamic-synonym.zip 
+
+   30  unzip dynamic-synonym.zip 
+
+   32  rm -rf dynamic-synonym.zip 
+   33  cd ../
+
+   35  cd config/
+   36  > analysis-ik/IKAnalyzer.cfg.xml 
+   37  cd analysis-ik/
+
+   39  vi IKAnalyzer.cfg.xml 
+   40  cd ../
+
+   42  vi elasticsearch.yml 
+   43  cd ../
+
+   45  chown -R elasticsearch:elasticsearch /home/elasticsearch
+   46  cd elasticsearch-6.7.0
+
+   48  cd bin/
+   49  su elasticsearch
+   50  vi /etc/sysctl.conf 
+   51  sysctl -p
+   52  sh elasticsearch
+   53  cd ../
+
+   55  cd logs/
+
+   57  cd ../
+   58  ll
+   59  cd bin/
+   60  su elasticsearch
+   
+
+```
