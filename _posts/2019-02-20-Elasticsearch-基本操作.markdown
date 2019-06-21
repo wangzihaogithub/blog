@@ -97,6 +97,8 @@ tags: Elasticsearch
       "text": "豪-大数据工程师"
     }
     
+    #查询集群数据状态
+    GET /_cluster/state
 ```
 
 ## 安装过程
