@@ -70,8 +70,8 @@ tags: Elasticsearch
     
     
     
-    
-    
+    #查询所有索引列表
+    GET _cat/indices?v
     
     #查询集群节点是否禁用内存交换（swapping）
     GET _nodes?filter_path=**.mlockall
@@ -102,7 +102,14 @@ tags: Elasticsearch
     GET /_cluster/state
 ```
 
+## 新建索引与数据
+    w
+
 ## 修复分片方法
+
+    # 查看分片错误异常原因
+    curl localhost:9200/_cluster/state
+    
     # 查看所有分片状态
     curl localhost:9200/_cat/shards
     
