@@ -107,8 +107,12 @@ tags: Elasticsearch
 
 ## 修复分片方法
 
+    # 官方文档
+    https://www.elastic.co/guide/en/elasticsearch/reference/7.2/cluster-allocation-explain.html
+   
     # 查看分片错误异常原因
-    curl localhost:9200/_cluster/state
+    curl localhost:9200/_cluster/allocation/explain
+    
     
     # 查看所有分片状态
     curl localhost:9200/_cat/shards
