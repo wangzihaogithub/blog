@@ -144,12 +144,8 @@ tags: Elasticsearch
    52  sh elasticsearch
    53  cd ../
 
-   55  cd logs/
-
-   57  cd ../
-   58  ll
-   59  cd bin/
-   60  su elasticsearch
-   
+   54  vi /etc/sysctl.conf
+    # 添加下面配置, 最大虚拟内存：vm.max_map_count=655360
+   55  sysctl -p
 
 ```
