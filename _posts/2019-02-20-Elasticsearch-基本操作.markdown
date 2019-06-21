@@ -82,6 +82,7 @@ tags: Elasticsearch
     #打开（默认关闭）动态数字映射
     PUT my_index_name
     
+    #查看所有分片状态
     GET _cat/shards
     
     
@@ -101,6 +102,12 @@ tags: Elasticsearch
     GET /_cluster/state
 ```
 
+## 修复分片方法
+    # 查看所有分片状态
+    curl localhost:9200/_cat/shards
+    
+    https://blog.csdn.net/weixin_37650458/article/details/84388054
+    
 ## 安装过程
 
 ```
