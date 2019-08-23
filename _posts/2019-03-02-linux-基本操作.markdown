@@ -63,3 +63,99 @@ tags: linux
  
  n -10：打印前 10 个文件
  
+ 
+ 
+###  基本脚本编写
+
+详细模式调试脚本
+    
+    sh -x startup.sh
+
+数学运算 (不能算小数)
+
+    a=`expr 1 + 2`
+    echo $a
+    
+    输出3
+    
+逻辑运算 (与-a 或-o)
+    
+    if [ $1 -eq $2 -a $1 = 1 ]
+        then
+        echo "param1 == param2 and param1 = 1"
+    elif [ $1 -ne $2 -o $1 = 2  ]
+        then
+        echo  "param1 != param2 or param1 = 2"
+    else
+        echo "others"
+    fi
+    
+for循环 # for var in [params] do ... done
+
+    for var in 1 2 3 4 5 6 7 8 9 10
+    do
+        echo "number is $var"
+    done
+    
+while循环 # while test do ... done
+     
+    num=1
+    sum=0
+    while [ $num -le 100 ]
+    do
+        sum=`expr $sum + $num`
+        num=`expr $num + 1`
+    done
+    #sleep 5
+    echo $sum
+
+case判断 
+ 
+    op=a
+    case $op in
+            a)
+        echo "you selected a";;
+            b)
+        echo "you selected b";;
+        c)
+        echo "you selected c";;
+        *)
+        echo "error"
+    esac
+
+菜单选择 # select var in [params] do ... done
+    
+    select var in "java" "c++" "php" "linux" "python" "ruby" "c#"
+    do
+        break
+    done
+    echo "you selected $var"
+    
+    
+判断是否是文件夹 # if test $1 then ... else ... fi
+
+    if [ -d $1 ] 
+    then
+        echo "this is a directory!"
+    else
+        echo "this is not a directory!"
+    fi
+    
+循环中退出 # continue, break
+    
+    i=0
+    while [ $i -le 100 ]
+    do
+        i=`expr $i + 1`
+        if [ $i -eq 5 -o $i -eq 10 ]
+            then continue;
+        else
+            echo "this number is $i"
+        fi
+     
+        if [ $i -eq 15 ]
+            then break;
+            fi
+    done
+    
+    
