@@ -16,7 +16,10 @@ tags: linux
     df 
     df -m 按M显示大小
 
-
+###  查看实时网络流量 (1秒统计一次)
+ 
+    watch -n 1 "/sbin/ifconfig"
+ 
 ### 统计nginx日志中某url分别被不同ip的访问次数
 
       grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
@@ -62,9 +65,8 @@ tags: linux
  head：输出文件开头部分的命令
  
  n -10：打印前 10 个文件
- 
- 
- 
+
+
 ###  基本脚本编写
 
 详细模式调试脚本
