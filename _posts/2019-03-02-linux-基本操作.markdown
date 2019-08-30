@@ -25,6 +25,73 @@ tags: linux
       grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
       匹配 精确等于 /user/list 从access.log文件中找 并且 将空格分割后下标为1的(ip)拼接下标为7的(api地址) 并且 排序令ip相邻 并且 去重 统计
 
+### 统计日志中 MetaTask-5线程执行的平均值
+
+2019-08-30 16:11:27.823 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveZuesDB -  
+2019-08-30 16:11:27.945 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 1.204秒 -> (saveZuesDB)  -  
+2019-08-30 16:11:27.945 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveMetaDB -  
+2019-08-30 16:11:29.485 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 1.833秒 -> (ZuesBizTaskPacket build)  -  
+2019-08-30 16:11:29.485 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentAttchmentPacket build -  
+2019-08-30 16:11:29.664 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 1.719秒 -> (saveMetaDB)  -  
+2019-08-30 16:11:29.664 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 225.233秒 -> (handler(packet))  -  
+2019-08-30 16:11:29.795 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> handler(packet) -  
+2019-08-30 16:11:30.390 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentPacket build. size[200] -  
+2019-08-30 16:11:30.397 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.912秒 -> (ZuesTalentAttchmentPacket build)  -  
+2019-08-30 16:11:30.397 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesPipelineSnapshotPacket build -  
+2019-08-30 16:11:31.074 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.677秒 -> (ZuesPipelineSnapshotPacket build)  -  
+2019-08-30 16:11:31.074 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesPipelineSnapshotItemPacket build -  
+2019-08-30 16:11:34.495 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 6.672秒 -> (saveZuesDB)  -  
+2019-08-30 16:11:34.495 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveMetaDB -  
+2019-08-30 16:11:34.677 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.182秒 -> (saveMetaDB)  -  
+2019-08-30 16:11:34.677 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 160.535秒 -> (handler(packet))  -  
+2019-08-30 16:11:35.361 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> handler(packet) -  
+2019-08-30 16:11:35.531 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentPacket build. size[200] -  
+2019-08-30 16:11:43.539 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 8.008秒 -> (ZuesTalentPacket build. size[200])  -  
+2019-08-30 16:11:43.539 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentEduExpPacket build -  
+2019-08-30 16:11:47.694 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 17.304秒 -> (ZuesTalentPacket build. size[200])  -  
+2019-08-30 16:11:47.694 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentEduExpPacket build -  
+2019-08-30 16:11:48.107 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.413秒 -> (ZuesTalentEduExpPacket build)  -  
+2019-08-30 16:11:48.107 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentProjectExpPacket build -  
+2019-08-30 16:11:48.181 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.074秒 -> (ZuesTalentProjectExpPacket build)  -  
+2019-08-30 16:11:48.181 [MetaTask-9] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentWorkExpPacket build -  
+2019-08-30 16:11:48.961 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 5.422秒 -> (ZuesTalentEduExpPacket build)  -  
+2019-08-30 16:11:48.961 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentProjectExpPacket build -  
+2019-08-30 16:11:48.968 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.007秒 -> (ZuesTalentProjectExpPacket build)  -  
+2019-08-30 16:11:48.968 [MetaTask-1] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentWorkExpPacket build -  
+2019-08-30 16:12:06.626 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 45.809秒 -> (ZuesPipelineSnapshotItemPacket build)  -  
+2019-08-30 16:12:06.626 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveZuesDB -  
+2019-08-30 16:12:06.772 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 124.203秒 -> (ZuesPipelineSnapshotItemPacket build)  -  
+2019-08-30 16:12:06.772 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveZuesDB -  
+2019-08-30 16:12:10.796 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 4.024秒 -> (saveZuesDB)  -  
+2019-08-30 16:12:10.796 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveMetaDB -  
+2019-08-30 16:12:11.625 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 4.999秒 -> (saveZuesDB)  -  
+2019-08-30 16:12:11.625 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveMetaDB -  
+2019-08-30 16:12:14.470 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 43.396秒 -> (ZuesPipelineSnapshotItemPacket build)  -  
+2019-08-30 16:12:14.470 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveZuesDB -  
+2019-08-30 16:12:14.663 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 3.867秒 -> (saveMetaDB)  -  
+2019-08-30 16:12:14.663 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 260.691秒 -> (handler(packet))  -  
+2019-08-30 16:12:14.669 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> handler(packet) -  
+2019-08-30 16:12:14.708 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 3.083秒 -> (saveMetaDB)  -  
+2019-08-30 16:12:14.708 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 136.07秒 -> (handler(packet))  -  
+2019-08-30 16:12:14.730 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> handler(packet) -  
+2019-08-30 16:12:15.154 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentPacket build. size[200] -  
+2019-08-30 16:12:15.227 [MetaTask-4] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentPacket build. size[200] -  
+2019-08-30 16:12:15.981 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 1.511秒 -> (saveZuesDB)  -  
+2019-08-30 16:12:15.981 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> saveMetaDB -  
+2019-08-30 16:12:16.134 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 0.153秒 -> (saveMetaDB)  -  
+2019-08-30 16:12:16.134 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 104.815秒 -> (handler(packet))  -  
+2019-08-30 16:12:18.699 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> handler(packet) -  
+2019-08-30 16:12:19.121 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentPacket build. size[200] -  
+2019-08-30 16:12:25.275 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 10.121秒 -> (ZuesTalentPacket build. size[200])  -  
+2019-08-30 16:12:25.275 [MetaTask-2] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentEduExpPacket build -  
+2019-08-30 16:12:27.430 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 停止 , 时长 : 8.309秒 -> (ZuesTalentPacket build. size[200])  -  
+2019-08-30 16:12:27.430 [MetaTask-8] INFO  com.ig.transform.service.task.TalentTask-  任务 : 启动 -> ZuesTalentEduExpPacket build -  
+
+    grep -w "(handler(packet))" nohup.out |grep -w "MetaTask-5"|awk '{ print $12 }'|awk '{gsub("秒","");print $0 }'|awk '{sum+=$1} END {print "平均值 = ", sum/NR}'
+    
+    输出: 平均值 =  67.9735
+
+
 ### 查看哪个进程占用的SWAP分区比较多
 
     for i in $(ls /proc | grep "^[0-9]" | awk '$0>100'); do awk '/Swap:/{a=a+$2}END{print '"$i"',a/1024"M"}' /proc/$i/smaps;done| sort -k2nr | head
