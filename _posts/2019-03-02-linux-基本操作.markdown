@@ -22,7 +22,14 @@ tags: linux
 
 ### 实时监控网络流量 (1秒统计一次)
  
-    watch -n 1 "/sbin/ifconfig"
+    watch -n 1 "/sbin/ifconfig" (系统自带)
+    
+    -----------------------
+    
+    yum install libpcap nethogs -y
+
+    nethogs (查看所有流量)
+    nethogs eth0 (指定网卡流量)
     
 ### 实时监控某进程的CPU
      
