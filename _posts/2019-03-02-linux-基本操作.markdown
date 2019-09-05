@@ -23,7 +23,11 @@ tags: linux
 ### 实时监控网络流量 (1秒统计一次)
  
     watch -n 1 "/sbin/ifconfig"
- 
+    
+### 实时监控某进程的CPU
+     
+    top -p 进程ID
+
 ### 统计nginx日志中某url分别被不同ip的访问次数
 
       grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
