@@ -286,6 +286,21 @@ skip-locking－－忽略外部文件锁定（如VFS层的锁定）
 
 skip-networking－－启动mysql时不启动网络模块，只允许通过socket连接。
 
+
+查询binlog事件 : 
+
+    列出所有binlog文件
+    mysql> show binary logs;
+    
+    查看当前正在写入的binlog文件
+    mysql> show master status;
+    
+    只查看第一个binlog文件的内容
+    mysql> show binlog events limit 100,10;
+    
+    查看指定binlog文件的内容
+    mysql> show binlog events in 'mysql-bin.000002' limit 100,10;
+
 查询状态 : 
 
 show status like '%Aborted_clients%'
