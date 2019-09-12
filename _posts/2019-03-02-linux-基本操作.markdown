@@ -153,6 +153,12 @@ tags: linux
 
 ###  基本脚本编写
 
+vi替换字符
+
+    :n,$s/vivian/sky/ 替换第 n 行开始到最后一行中每一行的第一个 vivian 为 sky
+    
+    :n,$s/vivian/sky/g 替换第 n 行开始到最后一行中每一行所有 vivian 为 sky
+
 详细模式调试脚本
     
     sh -x startup.sh
