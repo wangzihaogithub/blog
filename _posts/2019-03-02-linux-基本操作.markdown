@@ -257,7 +257,7 @@ case判断
 yum install jq
 
     data=$(curl "localhost:$PORT/transform/meta/task/setStateSuspendAll")
-    jq -n "$data"  | jq #打印控制台json
+    jq -n "$data"  #打印控制台json
     form_port=$(jq -n "$data"  | jq .form_port) #获取某个值
     
 
