@@ -35,6 +35,10 @@ tags: linux
      
     top -p 进程ID
 
+### 查询被杀掉的进程
+
+    egrep -i 'killed process' /var/log/messages
+
 ### 统计nginx日志中某url分别被不同ip的访问次数
 
       grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
