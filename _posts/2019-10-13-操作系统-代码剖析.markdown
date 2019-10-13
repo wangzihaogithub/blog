@@ -4,6 +4,8 @@ title:  "操作系统-代码剖析"
 tags: 操作系统
 ---
 
+总结一下计算机与操作系统的知识
+
     1.源码地址
     2.计算机的核心
     3.操作系统的核心
@@ -13,11 +15,8 @@ tags: 操作系统
         3.4 操作系统 - 进程上下文的备份的数据
 
 ### 1.源码地址
-
-总结一下计算机与操作系统的知识
-
-源码: https://github.com/wangzihaogithub/suos.git
-
+    
+    https://github.com/wangzihaogithub/suos.git
 
 ### 2.计算机的核心 
     
