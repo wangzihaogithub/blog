@@ -12,7 +12,8 @@ tags: 操作系统
         3.1 操作系统 - 中断的实现
         3.2 操作系统 - 进程切换的实现
         3.3 操作系统 - 进程的结构
-        3.4 操作系统 - 进程上下文的备份的数据
+        3.4 操作系统 - 进程上下文备份的存放
+        3.5 操作系统 - 用户创建进程
 
 ### 1.源码地址
     
@@ -86,11 +87,13 @@ tags: 操作系统
        RETI 
 
 接下来定时器会每间隔2毫秒调用一次Timer0_ServiceFunction函数, 这个函数会检查并改变当前的进程指针(注: 程序代码在进程实体里), 也就改变了CPU当前执行的程序,实现了进程切换.
-在执行进程的程序代码前后,操作系统会临时拷贝并恢复寄存器中值与部分内存(注:为了防止错误的程序导致硬件出错).
+在执行进程的程序代码前后,操作系统会临时拷贝并恢复寄存器值与部分内存(注:为了防止错误的程序导致硬件出错).
 
 注: 切换进程的高成本在于需要等待下一次中断事件,所以会有进程调度采用“时间片轮转”的策略，每个进程得到的时间片可随进程执行情况而变化。若进程经常产生中断，则给它分配较短的时间片，若进程被中断次数很少，则分给一个较长的时间片，
 
 ### 3.3 操作系统 - 进程的结构
+
+进程由PCB,程序段,数据段组成
 
         struct PCB_Struct
         {
@@ -104,12 +107,12 @@ tags: 操作系统
         };
         
         //	声明栈空间
-        extern uint8_t idata SystemStack[StackSize]; 	//系统栈，系统进程使用
-        extern uint8_t idata UserStack[StackSize];		//用户进程栈，用户进程使用,中转用
+        extern uint8_t idata SystemStack[StackSize]; 	//系统栈，系统进程使用,在硬件时钟产生中断事件时使用
+        extern uint8_t idata UserStack[StackSize];		//用户进程栈，用户进程使用
 
-### 3.4 操作系统 - 进程上下文的备份的寄存器与部分内存
+### 3.4 操作系统 - 进程上下文备份的存放
 
-这里是部分内存与寄存器值的备份
+这里备份有程序指针,堆栈指针,寄存器值,部分内存
         
         //	申明开辟CPU现场保存到进程PCB的中转站
         extern uint8_t  PSW_Backups;
@@ -127,3 +130,34 @@ tags: 操作系统
         extern uint8_t  DPH_Backups;
         extern uint8_t  DPL_Backups;
         
+        
+### 3.5 操作系统 - 用户创建进程
+
+        int8_t Create_Process(void (*Function)(void))
+        {
+            if (PCB_Number == PCB_MaxNumber-1) return -1; //进程数量已经满了
+            PCB_IndexTable[PCB_Number] = (struct PCB_Struct*)malloc(sizeof(struct PCB_Struct)); //为进程申请PCB 挂在PCB索引表上
+            PCB_IndexTable[PCB_Number]->Function = Function;		//保存进程入口地址
+            PCB_IndexTable[PCB_Number]->ProcessState = Ready;		//设置进程为就绪态
+            PCB_IndexTable[PCB_Number]->BlockEvent = 0;					//无阻塞事件
+            PCB_IndexTable[PCB_Number]->s = SemaphoreNull;			//没有信号量阻塞
+            PCB_IndexTable[PCB_Number]->PID = PCB_Number;				//进程标识符设置
+            PCB_IndexTable[PCB_Number]->SP = (uint8_t)UserStack+1;//进程栈指针，初始时栈中存放函数入口地址
+            PCB_IndexTable[PCB_Number]->ProcessStack[0] = (uint16_t)Function & 0x00ff;	//函数入口地址，低8位
+            PCB_IndexTable[PCB_Number]->ProcessStack[1] = ((uint16_t)Function>>8) & 0x00ff;	//高8位
+            PCB_IndexTable[PCB_Number]->PSW = 0;
+            PCB_IndexTable[PCB_Number]->ACC = 0;
+            PCB_IndexTable[PCB_Number]->B   = 0;
+            PCB_IndexTable[PCB_Number]->R0  = 0;
+            PCB_IndexTable[PCB_Number]->R1  = 0;
+            PCB_IndexTable[PCB_Number]->R2  = 0;
+            PCB_IndexTable[PCB_Number]->R3  = 0;
+            PCB_IndexTable[PCB_Number]->R4  = 0;
+            PCB_IndexTable[PCB_Number]->R5  = 0;
+            PCB_IndexTable[PCB_Number]->R6  = 0;
+            PCB_IndexTable[PCB_Number]->R7  = 0;
+            PCB_IndexTable[PCB_Number]->DPL = 0;
+            PCB_IndexTable[PCB_Number]->DPH = 0;
+            PCB_Number++;
+            return (int8_t)PCB_IndexTable[PCB_Number]->PID;
+        }
