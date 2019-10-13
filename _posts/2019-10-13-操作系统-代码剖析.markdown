@@ -40,18 +40,18 @@ tags: 操作系统
             //	初始化堆空间 位于内部扩展RAM 从0x00地址开始，400Byte
             init_mempool(HeapMemory,HeapSize);
             //	初始化定时器 2ms中断一次，即时间片为2ms
-            AUXR |= 0x80;			    //1T 模式
-            TMOD &= 0xF0;			    //16位自动重载
-            TL0 = 0x80;				    //初值装载
+            AUXR |= 0x80; //1T 模式
+            TMOD &= 0xF0; //16位自动重载
+            TL0 = 0x80; //初值装载
             TH0 = 0x44;				
-            TF0 = 0;					//标志清除
-            TR0 = 1;					//开启定时
+            TF0 = 0; //标志清除
+            TR0 = 1; //开启定时
             ET0 = 1;
             //	初始化SPI中断，SPI接口不被使用，该中断被用于用户态切换核心态
             //SPCTL = SPCTL & 0XBF; //关闭spi
             //IE2 = IE2 | 0X02;	// OPEN SPI INTERRUPT
             
-            EA  = 1;					//开中断
+            EA  = 1; //开中断
         }
 
 绑定处理中断事件的函数 (定时器, 按键设备, 显示屏)
@@ -97,18 +97,18 @@ tags: 操作系统
 
         struct PCB_Struct
         {
-            uint8_t ProcessStack[StackSize];											//进程栈，保存进程断点
-            enum {Ready=1,Block=2,Running=3} ProcessState;				//进程状态
-            uint8_t PID;																					//进程标识符
+            uint8_t ProcessStack[StackSize]; //进程栈，保存进程断点
+            enum {Ready=1,Block=2,Running=3} ProcessState; //进程状态
+            uint8_t PID;//进程标识符
             uint8_t PSW,R0,R1,R2,R3,R4,R5,R6,R7,ACC,B,DPH,DPL,SP; //进程现场
-            void (*Function)(void);																//进程函数入口
-            uint16_t BlockEvent;																	//阻塞事件
+            void (*Function)(void);	//进程函数入口
+            uint16_t BlockEvent; //阻塞事件
             Semaphore *s;
         };
         
         //	声明栈空间
-        extern uint8_t idata SystemStack[StackSize]; 	//系统栈，系统进程使用,在硬件时钟产生中断事件时使用
-        extern uint8_t idata UserStack[StackSize];		//用户进程栈，用户进程使用
+        extern uint8_t idata SystemStack[StackSize]; //系统栈，系统进程使用,在硬件时钟产生中断事件时使用
+        extern uint8_t idata UserStack[StackSize]; //用户进程栈，用户进程使用
 
 ### 3.4 操作系统 - 进程上下文备份的存放
 
@@ -137,11 +137,11 @@ tags: 操作系统
         {
             if (PCB_Number == PCB_MaxNumber-1) return -1; //进程数量已经满了
             PCB_IndexTable[PCB_Number] = (struct PCB_Struct*)malloc(sizeof(struct PCB_Struct)); //为进程申请PCB 挂在PCB索引表上
-            PCB_IndexTable[PCB_Number]->Function = Function;		//保存进程入口地址
-            PCB_IndexTable[PCB_Number]->ProcessState = Ready;		//设置进程为就绪态
-            PCB_IndexTable[PCB_Number]->BlockEvent = 0;					//无阻塞事件
-            PCB_IndexTable[PCB_Number]->s = SemaphoreNull;			//没有信号量阻塞
-            PCB_IndexTable[PCB_Number]->PID = PCB_Number;				//进程标识符设置
+            PCB_IndexTable[PCB_Number]->Function = Function; //保存进程入口地址
+            PCB_IndexTable[PCB_Number]->ProcessState = Ready; //设置进程为就绪态
+            PCB_IndexTable[PCB_Number]->BlockEvent = 0;	//无阻塞事件
+            PCB_IndexTable[PCB_Number]->s = SemaphoreNull; //没有信号量阻塞
+            PCB_IndexTable[PCB_Number]->PID = PCB_Number; //进程标识符设置
             PCB_IndexTable[PCB_Number]->SP = (uint8_t)UserStack+1;//进程栈指针，初始时栈中存放函数入口地址
             PCB_IndexTable[PCB_Number]->ProcessStack[0] = (uint16_t)Function & 0x00ff;	//函数入口地址，低8位
             PCB_IndexTable[PCB_Number]->ProcessStack[1] = ((uint16_t)Function>>8) & 0x00ff;	//高8位
