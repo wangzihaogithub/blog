@@ -16,6 +16,11 @@ tags: linux
     df 
     df -m 按M显示大小
 
+
+### 搜索文件
+
+    find /opt/upload -name '*c5300093-68cc-4d7f-8dd2-cc0875f8fedd*'
+    
 ### 实时监控磁盘读写 (1秒刷新一次)
     
     iostat -x 1   
