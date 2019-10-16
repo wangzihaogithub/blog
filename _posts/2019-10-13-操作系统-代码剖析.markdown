@@ -1,0 +1,302 @@
+---
+layout: post
+title:  "操作系统-代码剖析"
+tags: 操作系统
+---
+
+总结一下计算机与操作系统的知识
+
+    1.源码地址
+    2.计算机的核心
+    3.操作系统的核心
+        3.1 操作系统 - 中断的实现
+        3.2 操作系统 - 进程切换的实现
+        3.3 操作系统 - 进程的结构
+        3.4 操作系统 - 进程上下文备份的存放
+        3.5 操作系统 - 用户创建进程
+
+### 1.源码地址
+    
+    https://github.com/wangzihaogithub/suos.git
+
+### 2.计算机的核心 
+    
+    1.存储程序计算机
+    2.函数调用堆栈
+    3.中断
+
+### 3.操作系统的核心
+
+    1.中断上下文
+    2.进程上下文
+
+
+### 3.1 操作系统 - 中断的实现
+    
+硬件开发板会定时间隔触发一次中断事件, 按照说明书设置寄存器常量即可, 设置的是固定2毫秒可以改(也就是cpu调度周期), 代码如下:
+        
+        void Core_InitSystem(void)
+        {
+            //	初始化堆空间 位于内部扩展RAM 从0x00地址开始，400Byte
+            init_mempool(HeapMemory,HeapSize);
+            //	初始化定时器 2ms中断一次，即时间片为2ms
+            AUXR |= 0x80; //1T 模式
+            TMOD &= 0xF0; //16位自动重载
+            TL0 = 0x80; //初值装载
+            TH0 = 0x44;				
+            TF0 = 0; //标志清除
+            TR0 = 1; //开启定时
+            ET0 = 1;
+            //	初始化SPI中断，SPI接口不被使用，该中断被用于用户态切换核心态
+            //SPCTL = SPCTL & 0XBF; //关闭spi
+            //IE2 = IE2 | 0X02;	// OPEN SPI INTERRUPT
+            
+            EA  = 1; //开中断
+        }
+
+绑定处理中断事件的函数 (定时器, 按键设备, 显示屏)
+
+        ?C_STARTUP :
+            ORG 0X00
+            JMP System_Reset
+      
+            ;定时器0中断向量 (靠这个函数实现的进程切换)
+            ORG		0x0B
+            JMP		Timer0_ServiceFunction
+            
+            ;SPI 中断向量 (用户态进程将自己阻塞时,这个函数也会触发进程切换)
+            ORG 	0X4B
+            JMP		UserBlock_ServiceFunction
+            
+            ;UART 中断向量
+            ORG 	0X23
+            JMP		Uart_ServiceFunction
+            
+### 3.2 操作系统 - 进程切换的实现   
+
+定时器中断事件函数的逻辑
+   
+       ;定时器0中断服务函数 进程调度在此实现 
+       Timer0_ServiceFunction:
+        MOV 	SP_Backups, SP			;将当前用户的SP指针保存
+        MOV 	SP, #(SystemStack - 1)	;将系统栈设置为当前栈
+        LCALL 	Save_CPU_Context		;保存现场环境
+        LCALL 	Control_Process			;调用进程调度函数 调用后系统将切换现场信息和断点
+        LCALL 	Recovery_CPU_Context	;恢复现场信息
+        MOV 	SP, SP_Backups			;恢复栈指针
+       RETI 
+
+接下来定时器会每间隔2毫秒调用一次Timer0_ServiceFunction函数, 这个函数会检查并改变当前的进程指针(注: 程序代码在进程实体里), 也就改变了CPU当前执行的程序,实现了进程切换.
+在执行进程的程序代码前后,操作系统会临时拷贝并恢复寄存器值与部分内存(注:为了防止错误的程序导致硬件出错).
+
+进程调度策略
+   1. 采用“时间片轮转”的策略，每个进程得到的时间片可随进程执行情况而变化。若进程经常产生中断，则给它分配较短的时间片，若进程被中断次数很少，则分给一个较长的时间片，
+   2. 
+
+
+        
+        /**
+        *		功能：进程切换函数 由定时器0中断服务函数调用 实现时间片轮转
+        *		参数：无
+        *		返回值：无
+        */
+        void Switch_Process(void)
+        {
+            uint8_t i;
+            //	0.判断是否需要切换进程：若没有处于就绪态的进程则无需切换
+            bit Unwanted = 1;			//	不需要切换进程标志 为1时不切换
+            for (i = 0;i<=PCB_Number;i++) 
+                if (PCB_IndexTable[i]->ProcessState == Ready)
+                    Unwanted = 0;
+            if (Unwanted) return;
+            //	1.将用户栈空间复制到自己的PCB,腾出来给下一个进程
+            for (i=0;i<StackSize;i++)
+                PCB_IndexTable[PCB_Current]->ProcessStack[i] = UserStack[i];
+            // 	2.将CPU环境复制到PCB,腾出来给下一个进程
+            PCB_IndexTable[PCB_Current]->PSW = PSW_Backups;
+            PCB_IndexTable[PCB_Current]->ACC = ACC_Backups;
+            PCB_IndexTable[PCB_Current]->B   = B_Backups;
+            PCB_IndexTable[PCB_Current]->R0  = R0_Backups;
+            PCB_IndexTable[PCB_Current]->R1  = R1_Backups;
+            PCB_IndexTable[PCB_Current]->R2  = R2_Backups;
+            PCB_IndexTable[PCB_Current]->R3  = R3_Backups;
+            PCB_IndexTable[PCB_Current]->R4  = R4_Backups;
+            PCB_IndexTable[PCB_Current]->R5  = R5_Backups;
+            PCB_IndexTable[PCB_Current]->R6  = R6_Backups;
+            PCB_IndexTable[PCB_Current]->R7  = R7_Backups;
+            PCB_IndexTable[PCB_Current]->DPL = DPL_Backups;
+            PCB_IndexTable[PCB_Current]->DPH = DPH_Backups;
+            PCB_IndexTable[PCB_Current]->SP  = SP_Backups;
+            //  3.选择下一个就绪的进程并切换
+            //
+            i = PCB_Current;
+            while(1)   /*所有进程都阻塞了这么办？*/
+            {
+                if (i==PCB_Number) 
+                    i=0;																				//	循环查找
+                if (PCB_IndexTable[i]->ProcessState == Ready)	
+                    break; 																			//	找到下一个就绪的进程了，退出寻找
+                i++;																		
+            } 
+            if (PCB_IndexTable[PCB_Current]->ProcessState == Running) //如果当前进程为运行态
+                PCB_IndexTable[PCB_Current]->ProcessState = Ready;	//当前进程设置为就绪
+            PCB_Current = i;
+            PCB_IndexTable[PCB_Current]->ProcessState = Running;//找到的进程设置为运行状态
+            //	4.将找到的进程CPU的现场信息复制到中转站
+            PSW_Backups = PCB_IndexTable[PCB_Current]->PSW;
+            ACC_Backups = PCB_IndexTable[PCB_Current]->ACC;
+            B_Backups   = PCB_IndexTable[PCB_Current]->B;
+            R0_Backups  = PCB_IndexTable[PCB_Current]->R0;
+            R1_Backups  = PCB_IndexTable[PCB_Current]->R1;
+            R2_Backups  = PCB_IndexTable[PCB_Current]->R2;
+            R3_Backups  = PCB_IndexTable[PCB_Current]->R3;
+            R4_Backups  = PCB_IndexTable[PCB_Current]->R4;
+            R5_Backups  = PCB_IndexTable[PCB_Current]->R5;
+            R6_Backups  = PCB_IndexTable[PCB_Current]->R6;
+            R7_Backups  = PCB_IndexTable[PCB_Current]->R7;
+            DPL_Backups = PCB_IndexTable[PCB_Current]->DPL;
+            DPH_Backups = PCB_IndexTable[PCB_Current]->DPH;
+            SP_Backups  = PCB_IndexTable[PCB_Current]->SP;
+            //	5.将栈空间从PCB复制到用户栈
+            for (i=0;i<StackSize;i++)
+                UserStack[i] = PCB_IndexTable[PCB_Current]->ProcessStack[i];
+        }
+        
+        /**
+        *		功能：阻塞进程切换函数 由用户进程将自己阻塞时切换进程
+        *		参数：无
+        *		返回值：无
+        */
+        void BlockSwitch_Process(void)
+        {
+            uint8_t i;
+            //	0.判断是否需要切换进程：若没有处于就绪态的进程则无需切换
+            bit Unwanted = 1;			//	不需要切换进程标志 为1时不切换
+            for (i = 0;i<=PCB_Number;i++) 
+                if (PCB_IndexTable[i]->ProcessState == Ready)
+                    Unwanted = 0;
+            if (Unwanted) return;
+            //	1.将用户栈空间复制到自己的PCB,腾出来给下一个进程
+            for (i=0;i<StackSize;i++)
+                PCB_IndexTable[PCB_Current]->ProcessStack[i] = UserStack[i];
+            // 	2.将CPU环境复制到PCB,腾出来给下一个进程
+            PCB_IndexTable[PCB_Current]->PSW = PSW_Backups;
+            PCB_IndexTable[PCB_Current]->ACC = ACC_Backups;
+            PCB_IndexTable[PCB_Current]->B   = B_Backups;
+            PCB_IndexTable[PCB_Current]->R0  = R0_Backups;
+            PCB_IndexTable[PCB_Current]->R1  = R1_Backups;
+            PCB_IndexTable[PCB_Current]->R2  = R2_Backups;
+            PCB_IndexTable[PCB_Current]->R3  = R3_Backups;
+            PCB_IndexTable[PCB_Current]->R4  = R4_Backups;
+            PCB_IndexTable[PCB_Current]->R5  = R5_Backups;
+            PCB_IndexTable[PCB_Current]->R6  = R6_Backups;
+            PCB_IndexTable[PCB_Current]->R7  = R7_Backups;
+            PCB_IndexTable[PCB_Current]->DPL = DPL_Backups;
+            PCB_IndexTable[PCB_Current]->DPH = DPH_Backups;
+            PCB_IndexTable[PCB_Current]->SP  = SP_Backups;
+            //  3.选择下一个就绪的进程并切换
+            //
+            i = PCB_Current;
+            while(1)   /*所有进程都阻塞了这么办？*/
+            {
+                if (i==PCB_Number) 
+                    i=0;																				//	循环查找
+                if (PCB_IndexTable[i]->ProcessState == Ready)	
+                    break; 																			//	找到下一个就绪的进程了，退出寻找
+                i++;																		
+            } 
+            if (PCB_IndexTable[PCB_Current]->ProcessState == Running) //如果当前进程为运行态
+                PCB_IndexTable[PCB_Current]->ProcessState = Ready;	//当前进程设置为就绪
+            PCB_Current = i;
+            PCB_IndexTable[PCB_Current]->ProcessState = Running;//找到的进程设置为运行状态
+            //	4.将找到的进程CPU的现场信息复制到中转站
+            PSW_Backups = PCB_IndexTable[PCB_Current]->PSW;
+            ACC_Backups = PCB_IndexTable[PCB_Current]->ACC;
+            B_Backups   = PCB_IndexTable[PCB_Current]->B;
+            R0_Backups  = PCB_IndexTable[PCB_Current]->R0;
+            R1_Backups  = PCB_IndexTable[PCB_Current]->R1;
+            R2_Backups  = PCB_IndexTable[PCB_Current]->R2;
+            R3_Backups  = PCB_IndexTable[PCB_Current]->R3;
+            R4_Backups  = PCB_IndexTable[PCB_Current]->R4;
+            R5_Backups  = PCB_IndexTable[PCB_Current]->R5;
+            R6_Backups  = PCB_IndexTable[PCB_Current]->R6;
+            R7_Backups  = PCB_IndexTable[PCB_Current]->R7;
+            DPL_Backups = PCB_IndexTable[PCB_Current]->DPL;
+            DPH_Backups = PCB_IndexTable[PCB_Current]->DPH;
+            SP_Backups  = PCB_IndexTable[PCB_Current]->SP;
+            //	5.将栈空间从PCB复制到用户栈
+            for (i=0;i<StackSize;i++)
+                UserStack[i] = PCB_IndexTable[PCB_Current]->ProcessStack[i];
+        }
+        
+        
+### 3.3 操作系统 - 进程的结构
+
+进程由PCB,程序段,数据段组成
+
+        struct PCB_Struct
+        {
+            uint8_t ProcessStack[StackSize]; //进程栈，保存进程断点
+            enum {Ready=1,Block=2,Running=3} ProcessState; //进程状态
+            uint8_t PID;//进程标识符
+            uint8_t PSW,R0,R1,R2,R3,R4,R5,R6,R7,ACC,B,DPH,DPL,SP; //进程现场
+            void (*Function)(void);	//进程函数入口
+            uint16_t BlockEvent; //阻塞事件
+            Semaphore *s;
+        };
+        
+        //	声明栈空间
+        extern uint8_t idata SystemStack[StackSize]; //系统栈，系统进程使用,在硬件时钟产生中断事件时使用
+        extern uint8_t idata UserStack[StackSize]; //用户进程栈，用户进程使用
+
+### 3.4 操作系统 - 进程上下文备份的存放
+
+这里备份有程序指针,堆栈指针,寄存器值,部分内存
+        
+        //	申明开辟CPU现场保存到进程PCB的中转站
+        extern uint8_t  PSW_Backups;
+        extern uint8_t  R0_Backups;
+        extern uint8_t  R1_Backups;
+        extern uint8_t  R2_Backups;
+        extern uint8_t  R3_Backups;
+        extern uint8_t  R4_Backups;
+        extern uint8_t  R5_Backups;
+        extern uint8_t  R6_Backups;
+        extern uint8_t  R7_Backups;
+        extern uint8_t  ACC_Backups;
+        extern uint8_t  B_Backups;
+        extern uint8_t  SP_Backups;
+        extern uint8_t  DPH_Backups;
+        extern uint8_t  DPL_Backups;
+        
+        
+### 3.5 操作系统 - 用户创建进程
+
+        int8_t Create_Process(void (*Function)(void))
+        {
+            if (PCB_Number == PCB_MaxNumber-1) return -1; //进程数量已经满了
+            PCB_IndexTable[PCB_Number] = (struct PCB_Struct*)malloc(sizeof(struct PCB_Struct)); //为进程申请PCB 挂在PCB索引表上
+            PCB_IndexTable[PCB_Number]->Function = Function; //保存进程入口地址
+            PCB_IndexTable[PCB_Number]->ProcessState = Ready; //设置进程为就绪态
+            PCB_IndexTable[PCB_Number]->BlockEvent = 0;	//无阻塞事件
+            PCB_IndexTable[PCB_Number]->s = SemaphoreNull; //没有信号量阻塞
+            PCB_IndexTable[PCB_Number]->PID = PCB_Number; //进程标识符设置
+            PCB_IndexTable[PCB_Number]->SP = (uint8_t)UserStack+1;//进程栈指针，初始时栈中存放函数入口地址
+            PCB_IndexTable[PCB_Number]->ProcessStack[0] = (uint16_t)Function & 0x00ff;	//函数入口地址，低8位
+            PCB_IndexTable[PCB_Number]->ProcessStack[1] = ((uint16_t)Function>>8) & 0x00ff;	//高8位
+            PCB_IndexTable[PCB_Number]->PSW = 0;
+            PCB_IndexTable[PCB_Number]->ACC = 0;
+            PCB_IndexTable[PCB_Number]->B   = 0;
+            PCB_IndexTable[PCB_Number]->R0  = 0;
+            PCB_IndexTable[PCB_Number]->R1  = 0;
+            PCB_IndexTable[PCB_Number]->R2  = 0;
+            PCB_IndexTable[PCB_Number]->R3  = 0;
+            PCB_IndexTable[PCB_Number]->R4  = 0;
+            PCB_IndexTable[PCB_Number]->R5  = 0;
+            PCB_IndexTable[PCB_Number]->R6  = 0;
+            PCB_IndexTable[PCB_Number]->R7  = 0;
+            PCB_IndexTable[PCB_Number]->DPL = 0;
+            PCB_IndexTable[PCB_Number]->DPH = 0;
+            PCB_Number++;
+            return (int8_t)PCB_IndexTable[PCB_Number]->PID;
+        }
