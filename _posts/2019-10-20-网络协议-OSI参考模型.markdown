@@ -36,6 +36,25 @@ tags: 网络协议
 
 3.不拆3层及以上的包
 
+4.access口(只能属于一个VLAN)
+
+    一般用于连接计算机的端口
+
+5.trunk口(可以属于多个VLAN)
+
+    一般用于连接交换机的端口
+        它会在802.1Q协议头中加入4个字节的VLAN信息.(加tag标记)
+        2个字节的协议标识符（TPID)，当前置0x8100的固定值，表明该帧带有802.1Q的标记信息。 
+        2个字节的标记控制信息（TCI），包含了三个域。
+            Priority域，占3bits，表示报文的优先级，取值0到7，7为最高优先级，0为最低优先级。该域被802.1p采用。 
+            规范格式指示符（CFI)域，占1bit，0表示规范格式，应用于以太网；1表示非规范格式，应用于Token Ring。
+            VLAN ID域，占12bit，用于标示VLAN的归属。
+
+6.hybrid口(可以属于多个VLAN)
+    
+    可以用于连接计算机或交换机的端口
+    它和trunk端口在处理数据包时，方法是一样的。唯一不同之处在于发送数据包时，hybrid端口可以允许多个VLAN的数据包发送时不打标签，而truck端口只允许缺省VLAN(native VLAN或者default VLAN)的数据包发送时不打标签。
+
 #### MAC地址表
 
 | MAC地址 | 电口或光口 | VLAN | 
@@ -101,6 +120,17 @@ tags: 网络协议
         \r\n
         
 ### 2. 七层协议(OSI参考模型)
+
+| 七层结构   | 示例 | PDU(协议数据单元,不同层次的术语叫法) | 
+| :-                        | :-  | :-        | 
+| 7.Application(应用层)      | Data |           |
+| 6.Presentation(表示层)     | Data |            |
+| 5.Session(会话层)          | Data |            |
+| 4.Transport(传输层)        | TCP头| Segment(段) |
+| 3.Network(网络层)          | IP头 | Packet(包) |
+| 2.DataLink(数据链路层)      | Eth头| Frame(帧) |
+| 1.Physical(物理层)         | 00100101010100 |Bit(位) |
+
 
 ![7层协议](../../../images/postimg/7protocal.gif)
 
