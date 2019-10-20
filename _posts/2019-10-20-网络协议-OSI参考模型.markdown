@@ -14,9 +14,9 @@ tags: 网络协议
     2.七层协议(OSI参考模型)
         
         
-### 四层协议(TCP/IP参考模型)
+### 1. 四层协议(TCP/IP参考模型)
 
-### 1.物理层：网卡，网线，集线器，中继器，调制解调器
+### 1.1 物理层：网卡，网线，集线器，中继器，调制解调器
 
 物理层可以用不同的传输介质实现传播.        
 
@@ -26,7 +26,7 @@ tags: 网络协议
 
 3.无线信号
         
-### 2.数据链路层(MAC)：网桥，交换机
+### 1.2 数据链路层(MAC)：网桥，交换机
 
 交换机性质
 
@@ -39,7 +39,7 @@ tags: 网络协议
 | 00-F4-8D-D4-0E-D2 | Ethernet 0/0/1 | VLAN10|
 | 00-F4-8D-D4-0E-D1 | GE0/0/0        | VLAN10|
     
-### 3.网络层(TCP/IP)：路由器
+### 1.3 网络层(TCP/IP)：路由器
 
 | IP |MAC地址  | 
 | :-    | :-    | 
@@ -62,7 +62,7 @@ NAT服务(端口映射)
 | 119.27.177.225 | 81 | 192.168.1.106 | 8080 |
 
 
-### 4.应用层(HTTP): 应用服务器程序
+### 1.4 应用层(HTTP): 应用服务器程序
         
         Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\n
         Accept-Encoding: gzip, deflate\r\n
@@ -86,7 +86,7 @@ NAT服务(端口映射)
         </html>
         \r\n
         
-### 七层协议(OSI参考模型)
+### 2. 七层协议(OSI参考模型)
 
 ![7层协议](../../../images/postimg/7protocal.gif)
 
