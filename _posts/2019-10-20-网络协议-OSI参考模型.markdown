@@ -129,7 +129,7 @@ tags: 网络协议
 | 4.Transport(传输层)        | TCP头| Segment(段) | 端口号,区分程序网络数据的句柄号 |
 | 3.Network(网络层)          | IP头 | Packet(包) | IP地址 |
 | 2.DataLink(数据链路层)      | Eth头| Frame(帧) | 以太网地址 Ethernet/0 |
-| 1.Physical(物理层)         | 00100101010100 |Bit(位) | 光电无线传播硬件 |
+| 1.Physical(物理层)         | 00100101010100 |Bit(位) | 光电无线传播硬件,高低电平 |
 
 
 ![7层协议](../../../images/postimg/7protocal.gif)
