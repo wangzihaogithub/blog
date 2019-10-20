@@ -1,0 +1,96 @@
+---
+layout: post
+title:  "网络协议-MQTT"
+tags: 网络协议
+---
+
+总结一下网络的基础知识
+
+    1.四层协议(TCP/IP参考模型)
+        1.1 物理层(传输介质)：网卡，网线，集线器，中继器，调制解调器
+        1.2 数据链路层(MAC)：网桥，交换机
+        1.3 网络层(TCP/IP)：路由器
+        1.4 应用层(HTTP): 应用服务器程序
+    2.七层协议(OSI参考模型)
+        
+        
+### 四层协议(TCP/IP参考模型)
+
+#### 1.物理层：网卡，网线，集线器，中继器，调制解调器
+
+物理层可以用不同的传输介质实现传播.        
+
+1.光
+
+2.电
+
+3.无线信号
+        
+#### 2.数据链路层(MAC)：网桥，交换机
+
+交换机性质
+
+1.自动学习的地址表(如果遇到了未知的MAC地址,则会透传并广播所有网口,当有网口回应答是自己的MAC后,交换机会把MAC填写到地址表中)
+
+2.不负责3层及以上的拆包
+
+| MAC地址 | 电口或光口 | VLAN | 
+| :-    | :-        | :-    | 
+| 00-F4-8D-D4-0E-D2 | Ethernet 0/0/1 | VLAN10|
+| 00-F4-8D-D4-0E-D1 | GE0/0/0        | VLAN10|
+    
+#### 3.网络层(TCP/IP)：路由器
+
+| IP |MAC地址 |  VLAN | 
+| :-    | :-        | :-    | 
+| 192.168.1.100 | 00-F4-8D-D4-0E-D2 |
+| 192.168.1.101 | 00-F4-8D-D4-0E-D1 |
+   
+
+路由表
+
+| 目的IP地址 |子网掩码 |  网关(下一跳地址) | 
+| :-    | :-        | :-    | 
+| 172.16.0.0 | 255.255.0.0 | 10.1.1.3|
+| 192.168.2.0 | 255.255.255.0 | 10.1.1.4|
+
+NAT服务(端口映射)
+
+| 外网IP | 外网端口 | 内网IP | 内网端口 | 
+| :-    | :-      | :-    | :-      | 
+| 119.27.177.225 | 80 | 192.168.1.105 | 8080 |
+| 119.27.177.225 | 81 | 192.168.1.106 | 8080 |
+
+
+#### 4.应用层(HTTP): 应用服务器程序
+        
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\n
+        Accept-Encoding: gzip, deflate\r\n
+        Accept-Language: zh-CN,zh;q=0.9\r\n
+        Connection: keep-alive\r\n
+        Content-Length: 1316\r\n
+        Cookie: _ga=GA1.2.1033274423.1566727060; _gid=GA1.2.1447783838.1571453508; Hm_lvt_5133c77a1990b03c10ffdd62233302ce=1571453508,1571485117,1571545640,1571578967; Hm_lpvt_5133c77a1990b03c10ffdd62233302ce=1571578967\r\n
+        Host: zihaoapi.cn \r\n
+        \r\n
+        
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+            <head>
+                <title>test</title>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+            </head>
+            <body bgcolor="white">
+                <a href="test/">test/</a>
+            </body>
+        </html>
+        \r\n
+        
+### 七层协议(OSI参考模型)
+
+![7层协议](../../../images/postimg/7protocal.gif)
+
+
+
+
+
