@@ -125,7 +125,7 @@ tags: Elasticsearch
 
     7  groupadd elasticsearch
     8  useradd elasticsearch -g elasticsearch -p elasticsearch
-
+    9  passwd elasticsearch
    12  yum install lrzsz
    13  yum -y install java-1.8.0-openjdk*
    29  yum install zip unzip
