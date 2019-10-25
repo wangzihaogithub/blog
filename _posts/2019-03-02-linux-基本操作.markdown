@@ -11,6 +11,18 @@ tags: linux
 
 ---
 
+### 配置ssh免密登录
+   
+    在源机器上生成密匙, 拷贝到目标机器上
+    
+    ssh-keygen -t rsa
+    
+    ssh-copy-id targetuser@192.168.101.230
+    
+    ssh 'targetuser@192.168.101.230'
+    
+    登录成功!
+    
 ### 查看磁盘空间命令
     
     df 
