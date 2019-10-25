@@ -1,0 +1,137 @@
+---
+layout: post
+title:  "网络协议-OSI参考模型"
+tags: 网络协议
+---
+
+总结一下网络的基础知识
+
+    1.四层协议(TCP/IP参考模型)
+        1.1 物理层(传输介质)：网卡，网线，集线器，中继器，调制解调器
+        1.2 数据链路层(MAC)：网桥，交换机
+        1.3 网络层(TCP/IP)：路由器
+        1.4 应用层(HTTP): 应用服务器程序
+    2.七层协议(OSI参考模型)
+        
+        
+### 1. 四层协议(TCP/IP参考模型)
+
+### 1.1 物理层：网卡，网线，集线器，中继器，调制解调器
+
+物理层可以用不同的传输介质实现传播.        
+
+1.光
+
+2.电
+
+3.无线信号
+        
+### 1.2 数据链路层(MAC)：网桥，交换机
+
+#### 交换机的特点
+
+1.维护MAC地址表
+
+2.交换机寻址(如果遇到了未知的MAC地址,则会透传并广播所有网口,当有网口回应答是自己的MAC后,交换机再把MAC填到地址表中)
+
+3.不拆3层及以上的包
+
+4.access口(只能属于一个VLAN)
+
+    一般用于连接计算机的端口
+
+5.trunk口(可以属于多个VLAN)
+
+    一般用于连接交换机的端口
+        它会在802.1Q协议头中加入4个字节的VLAN信息.(加tag标记)
+        2个字节的协议标识符（TPID)，当前置0x8100的固定值，表明该帧带有802.1Q的标记信息。 
+        2个字节的标记控制信息（TCI），包含了三个域。
+            Priority域，占3bits，表示报文的优先级，取值0到7，7为最高优先级，0为最低优先级。该域被802.1p采用。 
+            规范格式指示符（CFI)域，占1bit，0表示规范格式，应用于以太网；1表示非规范格式，应用于Token Ring。
+            VLAN ID域，占12bit，用于标示VLAN的归属。
+
+6.hybrid口(可以属于多个VLAN)
+    
+    可以用于连接计算机或交换机的端口
+    它和trunk端口在处理数据包时，方法是一样的。唯一不同之处在于发送数据包时，hybrid端口可以允许多个VLAN的数据包发送时不打标签，而truck端口只允许缺省VLAN(native VLAN或者default VLAN)的数据包发送时不打标签。
+
+7.VLAN Interface(逻辑端口,三层交换机的功能,用于不同网段之间的通信)
+    
+    VLAN Interface给vlan配上虚拟IP，使vlan之间可路由互通
+    
+#### 交换机的MAC地址表
+
+| MAC地址 | 电口或光口 | VLAN | 
+| :-    | :-        | :-    | 
+| 00-F4-8D-D4-0E-D2 | Ethernet 0/0/1 | VLAN10|
+| 00-F4-8D-D4-0E-D1 | GE0/0/0        | VLAN10|
+
+    
+### 1.3 网络层(TCP/IP)：路由器
+
+#### 路由器的特点
+
+1.维护IP地址表
+
+2.维护路由表
+
+3.提供NAT服务(端口映射)
+
+#### 路由器的路由表
+
+| 网络号 |协议(表示当前行记录由什么协议获得到的) |出接口|  网关(下一跳地址) | 
+| :-    | :-        | :-                | :-    | 
+| 172.16.0.0/24 | Direct| Ethernet 0/0/1| 172.16.0.1|
+| 192.168.2.0/24 | Static| GE0/0/0      | 192.168.2.1|
+
+#### 路由器的NAT服务(端口映射)
+
+| 外网IP | 外网端口 | 内网IP | 内网端口 | 
+| :-    | :-      | :-    | :-      | 
+| 119.27.177.225 | 80 | 192.168.1.105 | 8080 |
+| 119.27.177.225 | 81 | 192.168.1.106 | 8080 |
+
+
+### 1.4 应用层(HTTP): 应用服务器程序
+        
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\n
+        Accept-Encoding: gzip, deflate\r\n
+        Accept-Language: zh-CN,zh;q=0.9\r\n
+        Connection: keep-alive\r\n
+        Content-Length: 1316\r\n
+        Cookie: _ga=GA1.2.1033274423.1566727060; _gid=GA1.2.1447783838.1571453508; Hm_lvt_5133c77a1990b03c10ffdd62233302ce=1571453508,1571485117,1571545640,1571578967; Hm_lpvt_5133c77a1990b03c10ffdd62233302ce=1571578967\r\n
+        Host: zihaoapi.cn \r\n
+        \r\n
+        
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+            <head>
+                <title>test</title>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+            </head>
+            <body bgcolor="white">
+                <a href="test/">test/</a>
+            </body>
+        </html>
+        \r\n
+        
+### 2. 七层协议(OSI参考模型)
+
+| 七层结构   | 示例 | PDU(协议数据单元,不同层次的术语叫法) | 描述 |
+| :-                        | :-  | :-     | :-  | 
+| 7.Application(应用层)      | Data |           | HTTP |
+| 6.Presentation(表示层)     | Data |            | 编码与解码,图片JPG,流媒体|
+| 5.Session(会话层)          | Data |            | 状态机 |
+| 4.Transport(传输层)        | TCP头| Segment(段) | 端口号,区分程序网络数据的句柄号 |
+| 3.Network(网络层)          | IP头 | Packet(包) | IP地址 |
+| 2.DataLink(数据链路层)      | Eth头| Frame(帧) | 以太网地址 Ethernet/0 |
+| 1.Physical(物理层)         | 00100101010100 |Bit(位) | 光电无线传播硬件,高低电平 |
+
+
+![7层协议](../../../images/postimg/7protocal.gif)
+
+
+
+
+
