@@ -27,8 +27,8 @@ tags: 微服务
 
     编写下面的类， 然后在jvm启动参数加 -javaagent:D:\wangzihao\plug\javaagent-1.0.jar 可以实现插入代码
     
-    该类的核心入口方法 1.premain(). 该方法在main方法前执行
-    该类的核心逻辑方法 2.java.lang.instrument.ClassFileTransformer的transform()方法
+    该类的核心入口方法     1.premain(). 该方法在main方法前执行
+    该类的核心运行逻辑方法  2.java.lang.instrument.ClassFileTransformer的transform()方法
     
     public class Javaagent {
         //该方法在main方法前执行
@@ -69,9 +69,9 @@ tags: 微服务
     
 ### 2. skywalking客户端的也是用这个方式实现的，不过skywalking是基于(bytebuddy框架)实现java.lang.instrument.ClassFileTransformer的transform（）方法。
 
-       org.apache.skywalking.apm.agent.SkyWalkingAgent.class 实现了入口方法premain()
+       类org.apache.skywalking.apm.agent.SkyWalkingAgent 实现了入口方法premain()
        
-       net.bytebuddy.agent.builder.AgentBuilder.Default.ExecutingTransformer.class 实现了逻辑方法transform()
+       类net.bytebuddy.agent.builder.AgentBuilder.Default.ExecutingTransformer 实现了运行逻辑 transform()
         
        skywalking封装的基础框架类在 apm-agent-core包中, 
        如果我们想写一个代码监控插件, 主要学习以下拦截器即可org.apache.skywalking.apm.agent.core.plugin.interceptor.*
