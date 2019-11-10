@@ -7,17 +7,20 @@ tags: 微服务
 
 ### 微服务APM之 - SkyWalking
     
-    SkyWalking是一款应用监控工具, 市面上大部分用于微服务领域. 它由以下3点组成。
-    1.客户端（skywalking-agent）
-    2.服务端（oap-server）
-    3.可视化UI (skywalking-ui)
+SkyWalking是一款应用监控工具, 市面上大部分用于微服务领域. 它由以下3点组成。
+
+1.客户端（skywalking-agent）
+
+    使用java探针(Agent) 实现了用户应用的监控埋点。主要是根据方法名，类名对各种框架进行构造方法，静态方法，普通方法插入代码进行AOP拦截。
+
+2.服务端（oap-server）
     
-    客户端: 使用java探针(Agent) 实现了用户应用的监控埋点。
-        主要是根据方法名，类名对各种框架进行构造方法，静态方法，普通方法插入代码进行AOP拦截。
-        
-    服务端：使用(grpc)TCP服务器，接收客户端的监控数据上报，并使用elasticsearch或其他数据库存储监控数据。
+    使用(grpc)TCP服务器，接收客户端的监控数据上报，并使用elasticsearch或其他数据库存储监控数据。
+
+3.可视化UI (skywalking-ui)
     
-    可视化UI: 使用（vue + typescript)实现了监控数据的可视化，并使用查询语言graphql查询监控数据。
+    使用（vue + typescript)实现了监控数据的可视化，并使用查询语言graphql查询监控数据。
+
 
 ---
 
@@ -25,10 +28,12 @@ tags: 微服务
 
 ### 1. 如何插入埋点的代码? 
 
-    编写下面的类， 然后在jvm启动参数加 -javaagent:D:\wangzihao\plug\javaagent-1.0.jar 可以实现插入代码
+编写下面类， 然后在jvm启动参数加 -javaagent:D:\wangzihao\plug\javaagent-1.0.jar 可以实现插入代码
     
-    该类的核心入口方法     1.premain(). 该方法在main方法前执行
-    该类的核心运行逻辑方法  2.java.lang.instrument.ClassFileTransformer的transform()方法
+该类的核心入口方法     1.premain(). 该方法在main方法前执行
+
+该类的核心运行逻辑方法  2.java.lang.instrument.ClassFileTransformer的transform()方法
+
     
     public class Javaagent {
         //该方法在main方法前执行
@@ -69,22 +74,25 @@ tags: 微服务
     
 ### 2. skywalking客户端的也是用这个方式实现的，不过skywalking是基于(bytebuddy框架)实现java.lang.instrument.ClassFileTransformer的transform（）方法。
 
-       类org.apache.skywalking.apm.agent.SkyWalkingAgent 实现了入口方法premain()
-       
-       类net.bytebuddy.agent.builder.AgentBuilder.Default.ExecutingTransformer 实现了运行逻辑 transform()
-        
-       skywalking封装的基础框架类在 apm-agent-core包中, 
-       如果我们想写一个代码监控插件, 主要学习以下拦截器即可org.apache.skywalking.apm.agent.core.plugin.interceptor.*
-       InstMethodsInter.class (普通方法拦截)
-       InstMethodsInterWithOverrideArgs.class (普通方法拦截,可以修改方法入参)
-       StaticMethodsInter.class (静态方法拦截)
-       StaticMethodsInterWithOverrideArgs.class (静态方法拦截,可以修改方法入参)
-       ConstructorInter.class (构造方法拦截,可以修改方法入参)
-       MethodInterceptResult.class (构造方法拦截,可以修改方法入参)
-       
-       接下来你就可以使用这些类中所使用的接口进行编程啦(方法执行前后时或异常时..等等).
-       
-       写完plugin后,打包放到目录下,你些的方法就会被调用了(注意: 因为你的代码是阻塞执行的,会延长用户的业务代码执行时间). 
+类org.apache.skywalking.apm.agent.SkyWalkingAgent 实现了入口方法premain()
+
+类net.bytebuddy.agent.builder.AgentBuilder.Default.ExecutingTransformer 实现了运行逻辑 transform()
+
+skywalking封装的基础框架类在 apm-agent-core包中, 
+
+如果我们想写一个代码监控插件, 主要学习以下拦截器即可org.apache.skywalking.apm.agent.core.plugin.interceptor.*
+
+    InstMethodsInter.class (普通方法拦截)
+    InstMethodsInterWithOverrideArgs.class (普通方法拦截,可以修改方法入参)
+    StaticMethodsInter.class (静态方法拦截)
+    StaticMethodsInterWithOverrideArgs.class (静态方法拦截,可以修改方法入参)
+    ConstructorInter.class (构造方法拦截,可以修改方法入参)
+    MethodInterceptResult.class (构造方法拦截,可以修改方法入参)
+
+
+接下来你就可以使用这些类中所使用的接口进行编程啦(方法执行前后时或异常时..等等).
+
+写完plugin后,打包放到目录下,你些的方法就会被调用了(注意: 因为你的代码是阻塞执行的,会延长用户的业务代码执行时间). 
 
 
 ### 微服务APM之 - 服务端（oap-server） - 
