@@ -7,7 +7,7 @@ tags: 微服务
 
 ### 微服务APM之 - SkyWalking
     
-SkyWalking是一款应用监控工具, 市面上大部分用于微服务领域. 它由以下3点组成。
+SkyWalking是一款java应用监控工具, 市面上大部分用于微服务领域. 它由以下3点组成。
 
 1.客户端（skywalking-agent）
 
