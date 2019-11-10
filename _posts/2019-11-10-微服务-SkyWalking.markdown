@@ -15,7 +15,7 @@ SkyWalking是一款java应用监控工具, 市面上大部分用于微服务领�
 
 2.服务端（oap-server）
     
-    使用(grpc)TCP服务器，接收客户端的监控数据上报，并使用elasticsearch或其他数据库存储监控数据。
+    使用(grpc)TCP服务器，接收客户端上报的监控数据，并使用elasticsearch或其他数据库存储监控数据。
 
 3.可视化UI (skywalking-ui)
     
@@ -72,7 +72,7 @@ SkyWalking是一款java应用监控工具, 市面上大部分用于微服务领�
     }
     
     
-### 2. skywalking客户端的也是用这个方式实现的，不过skywalking是基于(bytebuddy框架)实现java.lang.instrument.ClassFileTransformer的transform（）方法。
+### 2. skywalking客户端的也是用这个方式实现的，不过skywalking是基于(bytebuddy框架)实现了java.lang.instrument.ClassFileTransformer的transform（）方法。
 
 类org.apache.skywalking.apm.agent.SkyWalkingAgent 实现了入口方法premain()
 
@@ -80,14 +80,15 @@ SkyWalking是一款java应用监控工具, 市面上大部分用于微服务领�
 
 skywalking封装的基础框架类在 apm-agent-core包中, 
 
-如果我们想写一个代码监控插件, 主要学习以下拦截器即可org.apache.skywalking.apm.agent.core.plugin.interceptor.*
+如果我们想写一个代码监控插件, 主要学习拦截器 org.apache.skywalking.apm.agent.core.plugin.interceptor.*
 
     InstMethodsInter.class (普通方法拦截)
     InstMethodsInterWithOverrideArgs.class (普通方法拦截,可以修改方法入参)
+    
     StaticMethodsInter.class (静态方法拦截)
     StaticMethodsInterWithOverrideArgs.class (静态方法拦截,可以修改方法入参)
+    
     ConstructorInter.class (构造方法拦截,可以修改方法入参)
-    MethodInterceptResult.class (构造方法拦截,可以修改方法入参)
 
 
 接下来你就可以使用这些类中所使用的接口进行编程啦(方法执行前后时或异常时..等等).
