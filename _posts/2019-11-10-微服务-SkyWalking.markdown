@@ -7,21 +7,21 @@ tags: 微服务
 
 ### 微服务APM之 - SkyWalking
     
-    SkyWalking是一款实现了下面三点的工具。
-    1.监控应用的客户端（skywalking-agent）
-    2.监控应用的服务端（oap-server）
-    3.监控应用的可视化UI (skywalking-ui)
+    SkyWalking是一款应用监控工具, 市面上大部分用于微服务领域. 它由以下3点组成。
+    1.客户端（skywalking-agent）
+    2.服务端（oap-server）
+    3.可视化UI (skywalking-ui)
     
-    监控应用的客户端: 使用java探针(Agent)(使用框架bytebuddy) 实现了用户应用的监控埋点。
+    客户端: 使用java探针(Agent) 实现了用户应用的监控埋点。
         主要是根据方法名，类名对各种框架进行构造方法，静态方法，普通方法插入代码进行AOP拦截。
         
-    监控应用的服务端：使用(grpc)TCP服务器，接收客户端的监控数据上报，并使用elasticsearch或其他数据库存储监控数据。
+    服务端：使用(grpc)TCP服务器，接收客户端的监控数据上报，并使用elasticsearch或其他数据库存储监控数据。
     
-    监控应用的可视化UI: 使用（vue + typescript)实现了监控数据的可视化，并使用查询语言graphql查询监控数据。
+    可视化UI: 使用（vue + typescript)实现了监控数据的可视化，并使用查询语言graphql查询监控数据。
 
 ---
 
-### 微服务APM之 - 监控应用的客户端（skywalking-agent）
+### 微服务APM之 - 客户端（skywalking-agent）
 
 ### 1. 如何插入埋点的代码? 
 
@@ -87,7 +87,7 @@ tags: 微服务
        写完plugin后,打包放到目录下,你些的方法就会被调用了(注意: 因为你的代码是阻塞执行的,会延长用户的业务代码执行时间). 
 
 
-### 微服务APM之 - 监控应用的服务端（oap-server） - 
+### 微服务APM之 - 服务端（oap-server） - 
 
 
-### 微服务APM之 - 监控应用的可视化UI (skywalking-ui) - 
+### 微服务APM之 - 可视化UI (skywalking-ui) - 
