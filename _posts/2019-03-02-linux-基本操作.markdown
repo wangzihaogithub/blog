@@ -54,8 +54,10 @@ tags: linux
 
 ### 查询被杀掉的进程
 
-    egrep -i 'killed process' /var/log/messages
-
+    egrep -i -b3 'Killed process' /var/log/messages 
+    
+    -i忽略大小写,-b展示前后3行的上下文
+    
 ### 统计nginx日志中某url分别被不同ip的访问次数
 
       grep -w '/user/list' access.log | awk '{print $1}'|sort|uniq -c
