@@ -34,7 +34,9 @@ tags: JVM
 ### 看java对象布局的工具
 
     http://openjdk.java.net/projects/code-tools/jol/
-
+    
+    System.out.println(ClassLayout.parseInstance(beanMap).toPrintable());
+    
     <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-core -->
     <dependency>
         <groupId>org.openjdk.jol</groupId>
