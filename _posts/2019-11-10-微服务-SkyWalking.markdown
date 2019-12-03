@@ -100,3 +100,17 @@ skywalking封装的基础框架类在 apm-agent-core包中,
 
 
 ### 微服务APM之 - 可视化UI (skywalking-ui) - 
+
+
+
+### 客户端概括
+
+类型
+
+public enum org.apache.skywalking.apm.agent.core.context.trace.SpanLayer {
+   DB(1),
+   RPC_FRAMEWORK(2),
+   HTTP(3),
+   MQ(4),
+   CACHE(5);
+}
