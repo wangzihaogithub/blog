@@ -1,0 +1,49 @@
+---
+layout: post
+title:  "我的Netty项目-优化吞吐量"
+tags: 我的Netty项目
+---
+
+### 用JMeter测试。发现好久没性能测试，性能居然落后tomcat了。
+    
+起因： 今天在测试控制客户端连接数的时候发现的，下图是比较。
+
+![tomcat1s](../../../images/postimg/tomcat1s.png)
+
+![mynetty_before](../../../images/postimg/mynetty_before.png)
+    
+    很诡异， 因为以前测试的一直是高于tomcat20%的。
+    于是打开jvisualvm看一下，发现居然有个异常占线程cpu时间
+
+![cputime](../../../images/postimg/cputime.png)
+
+    于是打开idea的在异常时断点， 发现停在了这里
+![state](../../../images/postimg/state.jpg)
+    
+    但是不影响使用，HttpObjectEncoder这个state有4个状态
+    0=尚未发送，
+    1=等待写数据，但不是分块传输，
+    2=等待写数据，但是是空数据，是给websocket和状态码304，204，205用的，
+    3=等待写数据，是分块传输
+
+    这个state会在收到LastHttpContent后把状态改为0
+    那肯定是我重复发了第二次LastHttpContent造成的，因为已经正确把数据发送出去了，
+    它这个只要不错误顺序发Header就不影响流程。
+    于是翻代码
+
+![lasthttpcontent](../../../images/postimg/lasthttpcontent.png)
+
+    加上了后再试一下
+
+![mynetty_after](../../../images/postimg/mynetty_after.png)
+
+    吞吐量果然提上来了，
+    tomcat是10510+
+    我写的Netty容器变成了12900+
+
+
+---
+    
+    总结
+    
+    本次导致性能下降的原因是重复发送和异常扒栈的时间。数据发送的状态没维护好，下次要注意了。
