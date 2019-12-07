@@ -1,0 +1,28 @@
+---
+layout: post
+title:  "我的Netty项目-内存泄漏"
+tags: 我的Netty项目
+---
+
+### 用JMeter测试。发现提示内存泄漏。浏览器和postman访问没事，但用JMater就内存泄漏。
+    
+提示bytebuff是从FullHttpRequest的content中来的，没有被释放，
+这个释放的逻辑我是写在了输出流的close回掉方法里，那肯定是没有回调。
+
+于是我把回掉过程加上了bytebuff的touch方法追踪，并把netty的内存追踪级别开到最高。
+
+![bytebuftouch](../../../images/postimg/bytebuftouch.png)
+
+
+![bytebuffcallback](../../../images/postimg/bytebuffcallback.png)
+
+![bytebuffcalbaksucces](../../../images/postimg/bytebuffcalbaksucces.png)
+     
+
+---
+    
+    总结
+    为什么谷歌浏览器和postman没事呢？ 因为它俩都没有分块传输，而我这里写代码是分块传输才会异步刷新。
+        
+    每次写完一串回掉方法后，一定要再检查一遍流程啊，异步真的不好维护。 
+    对于使用池化的对象，要埋好追踪的代码，方便还原现场。
