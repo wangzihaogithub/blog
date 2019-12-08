@@ -18,6 +18,7 @@ tags: 我的Netty项目
 ![cputime](../../../images/postimg/cputime.png)
 
     于是打开idea的在异常时断点， 发现停在了这里
+
 ![state](../../../images/postimg/state.jpg)
     
     但是不影响使用，HttpObjectEncoder这个state有4个状态
