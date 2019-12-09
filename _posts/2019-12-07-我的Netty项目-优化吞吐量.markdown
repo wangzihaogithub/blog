@@ -8,18 +8,18 @@ tags: 我的Netty项目
     
 起因： 今天在测试控制客户端连接数的时候发现的，下图是比较。
 
-![tomcat1s](../../../images/postimg/tomcat1s.png)
+![tomcat1s](//zihaoapi.cn/static/cdn/postimg/tomcat1s.png)
 
-![mynetty_before](../../../images/postimg/mynetty_before.png)
+![mynetty_before](//zihaoapi.cn/static/cdn/postimg/mynetty_before.png)
     
     很诡异， 因为以前测试的一直是高于tomcat20%的。
     于是打开jvisualvm看一下，发现居然有个异常占线程cpu时间
 
-![cputime](../../../images/postimg/cputime.png)
+![cputime](//zihaoapi.cn/static/cdn/postimg/cputime.png)
 
     于是打开idea的在异常时断点， 发现停在了这里
 
-![state](../../../images/postimg/state.jpg)
+![state](//zihaoapi.cn/static/cdn/postimg/state.jpg)
     
     但是不影响使用，HttpObjectEncoder这个state有4个状态
     0=尚未发送，
@@ -32,11 +32,11 @@ tags: 我的Netty项目
     它这个只要不错误顺序发Header就不影响流程。
     于是翻代码
 
-![lasthttpcontent](../../../images/postimg/lasthttpcontent.png)
+![lasthttpcontent](//zihaoapi.cn/static/cdn/postimg/lasthttpcontent.png)
 
     加上了后再试一下
 
-![mynetty_after](../../../images/postimg/mynetty_after.png)
+![mynetty_after](//zihaoapi.cn/static/cdn/postimg/mynetty_after.png)
 
     吞吐量果然提上来了，
     tomcat是10510+

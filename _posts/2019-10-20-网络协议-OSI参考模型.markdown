@@ -129,7 +129,7 @@ tags: 网络协议
 | 1.Physical(物理层)         | 00100101010100 |Bit(位) | 光电无线传播硬件,高低电平 |
 
 
-![7层协议](../../../images/postimg/7protocal.gif)
+![7层协议](//zihaoapi.cn/static/cdn/postimg/7protocal.gif)
 
 
 

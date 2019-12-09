@@ -57,7 +57,7 @@ Netty集成20多种丰富的协议库，如RTSP,MQTT,SMTP,HTTP以及各种二进
             
 
 ## 测试        
-![成功](../../../images/postimg/nettyhallowoldsuccess.jpg)
+![成功](//zihaoapi.cn/static/cdn/postimg/nettyhallowoldsuccess.jpg)
 
 ## 总结
 其实平时用的多的就是ChannelHandler类, 

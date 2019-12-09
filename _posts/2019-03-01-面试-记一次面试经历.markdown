@@ -35,7 +35,7 @@ tags: 面试
     我觉得是外包公司, 不值当. 想等等阿里巴巴的面试结果
     (下图是级别定义)
   
-![信必优的级别定义](../../../images/postimg/mianshilevel.png)
+![信必优的级别定义](//zihaoapi.cn/static/cdn/postimg/mianshilevel.png)
 
 ##### 松果出行 (回家等回复)
 
@@ -50,9 +50,9 @@ tags: 面试
 
     关于时间复杂度 -> 简单的说. 不循环等于 o(1), 一个循环等于 o(n), 嵌套循环等于 o(n的2次方)
     
-![松果出行的面试题1](../../../images/postimg/mianshiti1.jpg)
+![松果出行的面试题1](//zihaoapi.cn/static/cdn/postimg/mianshiti1.jpg)
            
-![松果出行的面试题2](../../../images/postimg/mianshiti2.jpg)
+![松果出行的面试题2](//zihaoapi.cn/static/cdn/postimg/mianshiti2.jpg)
   
   
  松果出行的面试题 - 第一题答案

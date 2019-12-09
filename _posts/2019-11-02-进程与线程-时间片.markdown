@@ -27,7 +27,7 @@ tags: 进程与线程
 
     使用命令  top -H -p进程ID. 例: top -H -p25885, 结果如下
  
-![linux线程](../../../images/postimg/toppH.jpg)
+![linux线程](//zihaoapi.cn/static/cdn/postimg/toppH.jpg)
    
 ### 3. JAVA中对CPU时间片的操作(Thread.yield(),Thread.Sleep(0),Thread.Sleep(1))
 

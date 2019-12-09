@@ -11,12 +11,12 @@ tags: 我的Netty项目
 
 于是我把回掉过程加上了bytebuff的touch方法追踪，并把netty的内存追踪级别开到最高。
 
-![bytebuftouch](../../../images/postimg/bytebuftouch.png)
+![bytebuftouch](//zihaoapi.cn/static/cdn/postimg/bytebuftouch.png)
 
 
-![bytebuffcallback](../../../images/postimg/bytebuffcallback.png)
+![bytebuffcallback](//zihaoapi.cn/static/cdn/postimg/bytebuffcallback.png)
 
-![bytebuffcalbaksucces](../../../images/postimg/bytebuffcalbaksucces.png)
+![bytebuffcalbaksucces](//zihaoapi.cn/static/cdn/postimg/bytebuffcalbaksucces.png)
      
 
 ---

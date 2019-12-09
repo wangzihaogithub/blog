@@ -16,7 +16,7 @@ tags: Android
 
 异步处理技术很多种，下图为完整的继承树
 
-![异步](../../../images/photo/yibu.jpg)
+![异步](//zihaoapi.cn/static/cdn/photo/yibu.jpg)
 
 可以看到Thread是异步处理技术的基础
 

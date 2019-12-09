@@ -6,7 +6,7 @@ tags: 我的Netty项目
 
 ### 发现设置响应头的CPU时间长
     
-![dateformat](../../../images/postimg/dateformat.png)
+![dateformat](//zihaoapi.cn/static/cdn/postimg/dateformat.png)
 
     发现别的都是赋值语句，应该没问题。 那么锁定到下面这句话
     headers.set(HttpHeaderConstants.DATE, DATE_FORMAT_GMT_LOCAL.get().format(new Date()));
@@ -69,5 +69,5 @@ tags: 我的Netty项目
 
 改完后，JMeter测试吞吐量从12900+/s 变成了13650+/s
 
-![datetimeafter](../../../images/postimg/dateformatafter.jpg)
+![datetimeafter](//zihaoapi.cn/static/cdn/postimg/dateformatafter.jpg)
 
