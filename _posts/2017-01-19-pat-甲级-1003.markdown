@@ -44,7 +44,7 @@ Sample Output
 
 我的代码如下利用了Dijkstra求最短路径，基本思路如下图，根据题意修改部分代码
 
-![](../images/photo/Dijkstra.png)
+![](//zihaoapi.cn/static/cdn/photo/Dijkstra.png)
 
 上图为浙江大学陈越姥姥在慕课网上的数据结构课上提出
 
