@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "顺序容器类型!"
-tags:C++_library
+tags: C++_library
 
 ---
 <h3>顺序容器类型</h3>
